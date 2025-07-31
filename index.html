@@ -11,7 +11,6 @@
     body { font-family: 'Poppins', sans-serif; background-color: #f0f4ff; }
     .table-container { overflow-x: auto; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(59,130,246,0.1),0 8px 10px -5px rgba(59,130,246,0.05);}
     .selected-row { background-color: #e0f2fe !important;}
-    .editable:focus { outline: 2px solid #6366f1; background-color: #ffffff;}
     .holiday-cell { background-color: #fef2f2; color: #ef4444; font-weight: 500;}
     .today-cell { background-color: #f5f3ff; }
     .save-indicator { transition: opacity 0.3s ease-in-out;}
@@ -43,15 +42,6 @@
     <header class="app-header shadow-md">
       <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
         <h1 class="text-2xl font-bold app-title">SL Daily Work Report</h1>
-        <div class="flex items-center space-x-4">
-          <label for="employee-select" class="text-sm font-medium">Select:</label>
-          <select id="employee-select" class="w-48 pl-3 pr-10 py-2 rounded-xl">
-            <option value="" disabled selected>Choose name</option>
-            <option>P'Nuth</option><option>P'Note</option><option>P'Poom</option><option>P'O</option>
-            <option>Tew</option><option>PView</option><option>P'Bas</option><option>Big</option>
-            <option>Aim</option><option>Gib</option><option>Nut</option>
-          </select>
-        </div>
       </div>
       <div class="max-w-7xl mx-auto px-4 py-2 flex">
         <nav class="flex space-x-4">
@@ -89,7 +79,7 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-100">
               <tr>
-                <th class="px-4 py-2">Employee</th>
+                <th class="px-4 py-2">Employee (Click to select)</th>
                 <th class="px-4 py-2" id="monday-header">Monday <span class="date-header"></span></th>
                 <th class="px-4 py-2" id="tuesday-header">Tuesday <span class="date-header"></span></th>
                 <th class="px-4 py-2" id="wednesday-header">Wednesday <span class="date-header"></span></th>
@@ -155,8 +145,6 @@
     const saveIndicator=document.getElementById("save-indicator");
     const weekDisplay=document.getElementById("week-display");
     const datePicker=document.getElementById("date-picker");
-    const exportPreview=document.getElementById("export-preview");
-    const exportContent=document.getElementById("export-content");
 
     function formatDate(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
     function formatDateForStorage(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
@@ -181,6 +169,7 @@
       employees.forEach(emp=>{
         const tr=document.createElement("tr");
         tr.className=emp===selectedEmployee?"selected-row":"";
+        tr.addEventListener("click",()=>{selectedEmployee=emp;initializeTable();});
         const td=document.createElement("td");td.className="px-4 py-2";td.textContent=emp;tr.appendChild(td);
         daysOfWeek.forEach((day,i)=>{
           const d=currentWeekDates[i];const fd=formatDateForStorage(d);
@@ -222,7 +211,6 @@
       renderHolidays();
     }
 
-    document.getElementById("employee-select").addEventListener("change",e=>{selectedEmployee=e.target.value;initializeTable();});
     document.getElementById("save-button").addEventListener("click",async()=>{
       if(!selectedEmployee||!hasChanges)return;
       saveButton.disabled=true;saveButton.textContent="Saving...";
@@ -248,4 +236,19 @@
         div.append(inpDate,inpName,btn);holidaysContainer.appendChild(div);
       });
     }
-    document.getElementById("add-holiday-button").onclick=()=>{holidays.push({date:formatDateForStorage(today),name:""});renderHolidays
+    document.getElementById("add-holiday-button").onclick=()=>{holidays.push({date:formatDateForStorage(today),name:""});renderHolidays();};
+    document.getElementById("settings-save-button").onclick=async()=>{
+      await setDoc(doc(db,"settings","holidays"),{holidays});
+      document.getElementById("settings-save-indicator").style.opacity=1;
+      setTimeout(()=>document.getElementById("settings-save-indicator").style.opacity=0,2000);
+      initializeTable();
+    };
+
+    // Switch views
+    document.getElementById("nav-schedule").onclick=()=>{document.getElementById("schedule-view").classList.remove("hidden");document.getElementById("settings-view").classList.add("hidden");document.getElementById("nav-schedule").classList.add("active");document.getElementById("nav-settings").classList.remove("active");};
+    document.getElementById("nav-settings").onclick=()=>{document.getElementById("schedule-view").classList.add("hidden");document.getElementById("settings-view").classList.remove("hidden");document.getElementById("nav-settings").classList.add("active");document.getElementById("nav-schedule").classList.remove("active");};
+
+    fetchData();
+  </script>
+</body>
+</html>
