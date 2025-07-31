@@ -8,23 +8,27 @@
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* New Sunrise Theme 🌅 */
     body { 
       font-family: 'Kanit', sans-serif; 
-      background-color: #f0f4ff;
-      background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      /* New: Warmer, brighter background */
+      background-color: #fff7ed; 
     }
     .glass-card {
-      background: rgba(255, 255, 255, 0.70);
+      background: rgba(255, 255, 255, 0.75);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 24px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px S30px rgba(0, 0, 0, 0.07);
     }
-    .app-header { background: linear-gradient(135deg, #6366f1, #818cf8); }
+    .app-header { 
+      /* New: Sunrise gradient */
+      background: linear-gradient(135deg, #f43f5e, #f97316); 
+    }
     .app-title {
       font-weight: 700; font-size: 1.75rem;
-      background: linear-gradient(135deg, #ffffff, #e0e7ff);
+      background: linear-gradient(135deg, #ffffff, #fed7aa);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       text-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
@@ -38,13 +42,15 @@
       border-radius: 12px; font-weight: 500;
       transition: all 0.2s ease-out;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border: none;
     }
     .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .btn:disabled { cursor: not-allowed; opacity: 0.6; }
-    .btn-primary { background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; }
-    .btn-primary:hover:not(:disabled) { background: linear-gradient(135deg, #4338ca, #4f46e5); }
-    .btn-export { background: linear-gradient(135deg, #f97316, #fb923c); color: white; }
-    .btn-export:hover { background: linear-gradient(135deg, #ea580c, #f97316); }
+    /* New: Primary button matches new theme */
+    .btn-primary { background: linear-gradient(135deg, #f43f5e, #fb923c); color: white; }
+    .btn-primary:hover:not(:disabled) { background: linear-gradient(135deg, #e11d48, #f97316); }
+    .btn-export { background: linear-gradient(135deg, #0891b2, #22d3ee); color: white; }
+    .btn-export:hover { background: linear-gradient(135deg, #0e7490, #0891b2); }
     .btn-success { background: linear-gradient(135deg, #10b981, #34d399); color: white; }
     .btn-success:hover { background: linear-gradient(135deg, #059669, #10b981); }
     .btn-secondary { background-color: #e2e8f0; color: #475569; }
@@ -55,44 +61,47 @@
       overflow-x: auto;
     }
     tbody tr { transition: background-color 0.2s ease; cursor: pointer; }
-    tbody tr:hover { background-color: rgba(238, 242, 255, 0.9); }
-    .selected-row { background-color: #a5b4fc !important; color: #1e1b4b; font-weight: 600; }
+    /* New: Warmer hover color */
+    tbody tr:hover { background-color: #fff7ed; }
+    /* New: Warmer selected color */
+    .selected-row { background-color: #fed7aa !important; color: #7c2d12; font-weight: 600; }
     .holiday-cell { background-color: #fee2e2; color: #dc2626; font-weight: 500; }
-    .today-cell { background-color: #e0e7ff; }
+    .today-cell { background-color: #ffedd5; }
     .today-header {
-      background: linear-gradient(135deg, #a855f7, #6366f1) !important;
+      /* New: Sunrise gradient for today's header */
+      background: linear-gradient(135deg, #f43f5e, #f97316) !important;
       color: white !important;
     }
     .today-header .date-header { color: white; font-weight: 600; }
     .form-input {
-      border: 1px solid #d1d5db; border-radius: 8px; padding: 0.75rem 0.75rem; /* Increased padding for mobile */
+      border: 1px solid #d1d5db; border-radius: 8px; padding: 0.75rem 0.75rem;
       transition: all 0.2s ease;
       width: 100%;
     }
     .form-input:focus {
-      outline: none; border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+      outline: none; border-color: #f97316; box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.3);
     }
     .combobox-panel {
         display: none; position: absolute; z-index: 50; max-height: 160px; overflow-y: auto;
         background: white; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
         border: 1px solid #e5e7eb; margin-top: 4px; width: 100%;
     }
-    .combobox-option { padding: 10px 12px; cursor: pointer; font-size: 1rem; } /* Increased padding for mobile */
-    .combobox-option:hover { background: #f3f4f6; }
-    .combobox-option.highlighted { background: #eef2ff; color: #4f46e5; }
+    .combobox-option { padding: 10px 12px; cursor: pointer; font-size: 1rem; }
+    .combobox-option:hover { background: #fff7ed; }
+    .combobox-option.highlighted { background: #ffedd5; color: #9a3412; }
     #export-source { position: absolute; left: -9999px; top: 0; }
   </style>
 </head>
 <body class="text-slate-700">
   <div id="loading-overlay" class="fixed inset-0 bg-white/50 flex flex-col items-center justify-center z-50">
-    <div class="w-16 h-16 border-4 border-slate-200 border-t-indigo-500 rounded-full animate-spin"></div>
-    <p class="mt-4 text-slate-800 font-semibold text-lg">กำลังโหลดข้อมูลตารางงาน...</p>
+    <div class="w-16 h-16 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin"></div>
+    <p class="mt-4 text-orange-800 font-semibold text-lg">เตรียมข้อมูลดีๆ สำหรับวันทำงานของคุณ...</p>
   </div>
 
   <div class="min-h-screen flex flex-col">
     <header class="app-header shadow-lg sticky top-0 z-30">
         <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <h1 class="app-title">SL Daily Work Report</h1>
+            <h1 class="app-title">SL Daily Work Report ☀️</h1>
         </div>
         <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pb-3">
             <nav class="flex space-x-2">
@@ -113,9 +122,9 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <h2 class="text-2xl font-bold text-slate-800">Weekly Schedule</h2>
           <div class="flex items-center space-x-3 self-end sm:self-center">
-            <span id="save-indicator" class="text-sm text-green-600 font-semibold opacity-0 save-indicator">บันทึกแล้ว!</span>
+            <span id="save-indicator" class="text-sm text-green-600 font-semibold opacity-0 save-indicator"></span>
             <button id="export-button" class="px-4 py-2 text-sm btn btn-export flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V4a1 1 0 00-1-1h-1z" /><path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" /><path d="M5 13a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1H5zM8 13a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1H8zM11 13a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1h-1zM14 13a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1h-1z" /></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
               <span>Export</span>
             </button>
             <button id="save-button" class="px-4 py-2 text-sm btn btn-primary" disabled>Save Changes</button>
@@ -123,13 +132,13 @@
         </div>
 
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 flex-wrap">
-          <div class="flex items-center bg-slate-100 rounded-full p-1">
-            <button id="prev-week" class="p-2 rounded-full hover:bg-slate-200 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+          <div class="flex items-center bg-orange-100 rounded-full p-1">
+            <button id="prev-week" class="p-2 rounded-full hover:bg-orange-200 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </button>
-            <span id="week-display" class="font-semibold text-indigo-600 px-4 text-center text-sm sm:text-base"></span>
-            <button id="next-week" class="p-2 rounded-full hover:bg-slate-200 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            <span id="week-display" class="font-semibold text-orange-800 px-4 text-center text-sm sm:text-base"></span>
+            <button id="next-week" class="p-2 rounded-full hover:bg-orange-200 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
           <div class="flex items-center space-x-2">
@@ -157,11 +166,11 @@
       
       <div id="settings-view" class="glass-card p-6 lg:p-8 hidden">
         <h2 class="text-2xl font-bold text-slate-800 mb-6">Settings - Holidays</h2>
-        <div id="holidays-container" class="space-y-3"></div>
+        <div id="holidays-container" class="space-y-4"></div>
         <div class="mt-6 flex items-center gap-4">
           <button id="add-holiday-button" class="btn btn-secondary px-4 py-2">Add Holiday</button>
           <button id="settings-save-button" class="btn btn-primary px-4 py-2">Save Settings</button>
-          <span id="settings-save-indicator" class="ml-3 text-green-600 font-semibold opacity-0 save-indicator">บันทึกแล้ว!</span>
+          <span id="settings-save-indicator" class="ml-3 text-green-600 font-semibold opacity-0 save-indicator"></span>
         </div>
       </div>
     </main>
@@ -172,7 +181,7 @@
   <div id="export-preview" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 hidden">
     <div class="export-container glass-card w-full max-w-5xl h-full max-h-[90vh] flex flex-col p-4 gap-4">
       <div id="export-content" class="flex-grow rounded-xl overflow-y-auto bg-white p-2">
-        </div>
+      </div>
        <button class="export-close absolute -top-2 -right-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center cursor-pointer font-bold hover:bg-red-600 transition-transform hover:scale-110 z-10" id="export-close">✕</button>
       <div class="flex-shrink-0 flex justify-center gap-4">
         <button id="download-image" class="btn btn-primary px-5 py-2">Download</button>
@@ -221,7 +230,7 @@
     function createCellEditor(container, initialValue, options, onChange) {
       container.innerHTML = '';
       const editorWrapper = document.createElement('div');
-      editorWrapper.className = 'cell-editor-wrapper relative w-full'; // Use Combobox for all devices
+      editorWrapper.className = 'cell-editor-wrapper relative w-full';
       
       const input = document.createElement('input');
       input.type = 'text'; 
@@ -255,7 +264,7 @@
       };
       input.addEventListener('input', () => { 
         updateOptions(input.value); 
-        onChange(input.value); // Allow custom values
+        onChange(input.value);
       });
       input.addEventListener('focus', () => { updateOptions(input.value); panel.style.display = 'block'; });
       input.addEventListener('blur', () => { setTimeout(() => { panel.style.display = 'none'; }, 200); });
@@ -285,14 +294,14 @@
         const td=document.createElement("td");
         td.className="px-6 py-4 whitespace-nowrap text-sm font-medium sticky left-0 z-10";
         td.textContent=emp;
-        td.style.backgroundColor = tr.classList.contains('selected-row') ? '#a5b4fc' : '#ffffff';
+        td.style.backgroundColor = tr.classList.contains('selected-row') ? '#fed7aa' : '#ffffff';
         tr.appendChild(td);
 
         daysOfWeek.forEach((day,i)=>{
           const d=currentWeekDates[i];
           const fd=formatDateForStorage(d);
           const cell=document.createElement("td");
-          cell.className="px-2 sm:px-6 py-2 whitespace-nowrap text-sm"; // Reduced py for editor height
+          cell.className="px-2 sm:px-6 py-2 whitespace-nowrap text-sm";
           
           if(isHoliday(d)){
             cell.textContent="Holiday: "+getHolidayName(d);
@@ -348,7 +357,12 @@
       if(!selectedEmployee||!hasChanges)return;
       saveButton.disabled=true;saveButton.textContent="Saving...";
       await setDoc(doc(db,"schedules",selectedEmployee),currentData[selectedEmployee]||{},{merge:true});
-      saveIndicator.style.opacity=1;setTimeout(()=>saveIndicator.style.opacity=0,2500);
+      saveIndicator.textContent = "อัปเดตเรียบร้อย!";
+      saveIndicator.style.opacity=1;
+      setTimeout(() => {
+        saveIndicator.style.opacity = 0;
+        saveButton.textContent = "Save Changes";
+      }, 2500);
       hasChanges=false;
     });
 
@@ -363,9 +377,8 @@
     function renderHolidays(){
       holidaysContainer.innerHTML="";
       holidays.forEach((h,i)=>{
-        // FIX: Responsive holiday row
         const div=document.createElement("div");
-        div.className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2";
+        div.className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full";
         
         const inpDate=document.createElement("input");
         inpDate.type="date";inpDate.value=h.date;inpDate.className="form-input";
@@ -373,7 +386,7 @@
         
         const inpName=document.createElement("input");
         inpName.type="text";inpName.value=h.name;inpName.placeholder="Holiday name";
-        inpName.className="form-input w-full flex-1"; // flex-1 for desktop
+        inpName.className="form-input w-full sm:flex-1";
         inpName.oninput=()=>{holidays[i].name=inpName.value;};
 
         const btn=document.createElement("button");
@@ -390,6 +403,7 @@
       const btn = document.getElementById("settings-save-button");
       btn.disabled = true;
       await setDoc(doc(db,"settings","holidays"),{holidays});
+      settingsSaveIndicator.textContent = "อัปเดตเรียบร้อย!";
       settingsSaveIndicator.style.opacity=1;
       setTimeout(()=>{
         settingsSaveIndicator.style.opacity=0;
@@ -454,7 +468,7 @@
                 } else {
                     cell.textContent = currentData[emp]?.[fd] || '---';
                 }
-                if (isSameDay(d, today)) { cell.classList.add("bg-indigo-100"); }
+                if (isSameDay(d, today)) { cell.classList.add("bg-orange-100"); }
                 tr.appendChild(cell);
             });
             tbody.appendChild(tr);
@@ -466,7 +480,7 @@
             const canvas = await html2canvas(exportSource, { scale: 2, useCORS: true, logging: false });
             const img = document.createElement("img");
             img.src = canvas.toDataURL("image/png");
-            img.className = "max-w-full h-auto object-contain mx-auto"; // Center image
+            img.className = "max-w-full h-auto object-contain mx-auto";
             exportContent.innerHTML = "";
             exportContent.appendChild(img);
             exportPreview.classList.remove("hidden");
