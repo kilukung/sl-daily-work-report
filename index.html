@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SL Daily Work Report</title>
+  <title>Work Schedule</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* New Minimalist Theme */
+    /* Minimalist Theme */
     body { 
       font-family: 'Kanit', sans-serif; 
       background-color: #f8fafc; /* slate-50 */
@@ -88,7 +88,7 @@
   </style>
 </head>
 <body class="text-slate-700">
-  <div id="loading-overlay" class="fixed inset-0 bg-white/50 flex flex-col items-center justify-center z-50">
+  <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-50">
     <div class="w-16 h-16 border-4 border-slate-200 border-t-slate-500 rounded-full animate-spin"></div>
     <p class="mt-4 text-slate-800 font-semibold text-lg">Loading Schedule...</p>
   </div>
@@ -224,7 +224,6 @@
       input.value = initialValue || ''; 
       input.placeholder = 'Select or type...';
 
-      // Simple implementation without dropdown for minimalism in this context
       input.addEventListener('input', () => onChange(input.value));
       editorWrapper.appendChild(input);
       container.appendChild(editorWrapper);
@@ -297,18 +296,29 @@
       });
       initializeTable();
     }
+    
+    // FIX: Added try-catch-finally block to handle loading errors gracefully
+    async function fetchData() {
+        loadingOverlay.style.display = "flex";
+        try {
+            const sSnap = await getDocs(collection(db, "schedules"));
+            currentData = {};
+            sSnap.forEach(d => { currentData[d.id] = d.data(); });
 
-    async function fetchData(){
-      loadingOverlay.style.display="flex";
-      const sSnap=await getDocs(collection(db,"schedules"));
-      currentData = {};
-      sSnap.forEach(d=>{currentData[d.id]=d.data();});
-      const hSnap=await getDoc(doc(db,"settings","holidays"));
-      if(hSnap.exists()) { holidays=hSnap.data().holidays||[]; }
-      setCurrentWeek(getMonday(today));
-      loadingOverlay.style.display="none";
-      renderHolidays();
+            const hSnap = await getDoc(doc(db, "settings", "holidays"));
+            holidays = (hSnap.exists() && hSnap.data().holidays) ? hSnap.data().holidays : [];
+
+            setCurrentWeek(getMonday(today));
+            renderHolidays();
+        } catch (error) {
+            console.error("Error fetching data from Firebase:", error);
+            alert("Could not load data. Please check your internet connection or Firebase setup.\n\nError: " + error.message);
+        } finally {
+            // This will always run, ensuring the loading screen is hidden.
+            loadingOverlay.style.display = "none";
+        }
     }
+
 
     saveButton.addEventListener("click",async()=>{
       if(!selectedEmployee||!hasChanges)return;
@@ -339,12 +349,12 @@
         
         const inpDate=document.createElement("input");
         inpDate.type="date";inpDate.value=h.date;
-        inpDate.className="form-input sm:w-44"; // FIX: Set specific smaller width for date
+        inpDate.className="form-input sm:w-44";
         inpDate.onchange=()=>{holidays[i].date=inpDate.value;};
         
         const inpName=document.createElement("input");
         inpName.type="text";inpName.value=h.name;inpName.placeholder="Holiday Name";
-        inpName.className="form-input w-full flex-1"; // flex-1 will fill remaining space
+        inpName.className="form-input w-full flex-1";
         inpName.oninput=()=>{holidays[i].name=inpName.value;};
 
         const btn=document.createElement("button");
@@ -388,7 +398,6 @@
         navSchedule.classList.remove("active");
     };
     
-    // FIX: New Minimalist Export UI Generation
     const exportButton=document.getElementById("export-button");
     const exportPreview=document.getElementById("export-preview");
     const exportContent=document.getElementById("export-content");
@@ -439,7 +448,6 @@
                 cell.className = "p-4 text-lg text-slate-600";
                 
                 if (isHoliday(d)) {
-                    // FIX: Ensure 'Holiday' text is included
                     const holidayName = getHolidayName(d);
                     cell.innerHTML = `<span class="font-semibold text-red-700">Holiday</span>${holidayName ? `: ${holidayName}` : ''}`;
                     cell.classList.add("bg-red-50");
