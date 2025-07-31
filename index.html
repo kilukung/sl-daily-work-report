@@ -137,10 +137,6 @@
           </div>
         </div>
         
-        <div id="edit-prompt" class="my-4 p-3 bg-indigo-100 text-indigo-800 rounded-lg text-center font-semibold hidden">
-           ⬅️ กรุณาเลือกพนักงานในตารางเพื่อแก้ไขข้อมูล
-        </div>
-        
         <div class="table-container">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-100 z-20">
@@ -157,9 +153,16 @@
           </table>
         </div>
       </div>
-
+      
       <div id="settings-view" class="glass-card p-6 lg:p-8 hidden">
-         </div>
+        <h2 class="text-2xl font-bold text-slate-800 mb-6">Settings - Holidays</h2>
+        <div id="holidays-container" class="space-y-3"></div>
+        <div class="mt-6 flex items-center gap-4">
+          <button id="add-holiday-button" class="btn btn-secondary px-4 py-2">Add Holiday</button>
+          <button id="settings-save-button" class="btn btn-primary px-4 py-2">Save Settings</button>
+          <span id="settings-save-indicator" class="ml-3 text-green-600 font-semibold opacity-0 save-indicator">บันทึกแล้ว!</span>
+        </div>
+      </div>
     </main>
   </div>
   
@@ -205,7 +208,6 @@
     const saveIndicator=document.getElementById("save-indicator");
     const weekDisplay=document.getElementById("week-display");
     const datePicker=document.getElementById("date-picker");
-    const editPrompt = document.getElementById("edit-prompt");
 
     function formatDate(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
     function formatDateForStorage(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
@@ -216,90 +218,80 @@
     function getHolidayName(d){const f=formatDateForStorage(d);const h=holidays.find(x=>x.date===f);return h?h.name:'';}
 
     function createCellEditor(container, initialValue, options, onChange) {
-      container.innerHTML = ''; // Clear previous content
+      container.innerHTML = '';
+      const editorWrapper = document.createElement('div');
+      editorWrapper.className = 'cell-editor-wrapper'; // Wrapper to prevent row click
       
-      // Use native select for mobile for better UX
       if (isMobile) {
         const select = document.createElement("select");
         select.className="form-input w-full bg-white/80";
         const optEmpty=document.createElement("option");
-        optEmpty.value="";
-        optEmpty.textContent="-- เลือก --";
+        optEmpty.value=""; optEmpty.textContent="-- เลือก --";
         select.appendChild(optEmpty);
         
         options.forEach(op=>{
           const o=document.createElement("option");
-          o.textContent=op;
-          o.value = op;
+          o.textContent=op; o.value = op;
           if (op === initialValue) o.selected = true;
           select.appendChild(o);
         });
         
         select.addEventListener("change", (e) => onChange(e.target.value));
-        container.appendChild(select);
-        return;
-      }
+        editorWrapper.appendChild(select);
+      } else {
+        editorWrapper.className += ' relative w-full';
+        const input = document.createElement('input');
+        input.type = 'text'; input.className = 'form-input';
+        input.value = initialValue || ''; input.placeholder = '-- Select --';
 
-      // Use searchable combobox for desktop
-      const wrapper = document.createElement('div');
-      wrapper.className = 'relative w-full';
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.className = 'form-input';
-      input.value = initialValue || '';
-      input.placeholder = '-- Select --';
+        const panel = document.createElement('div');
+        panel.className = 'combobox-panel';
 
-      const panel = document.createElement('div');
-      panel.className = 'combobox-panel';
-
-      const updateOptions = (filter = '') => {
-        panel.innerHTML = '';
-        const filteredOptions = options.filter(opt => opt.toLowerCase().includes(filter.toLowerCase()));
-        if (filteredOptions.length === 0) {
-            panel.innerHTML = `<div class="combobox-option text-slate-500">No results</div>`;
-        } else {
-            filteredOptions.forEach(opt => {
-                const optionEl = document.createElement('div');
-                optionEl.className = 'combobox-option';
-                optionEl.textContent = opt;
-                if (opt === input.value) optionEl.classList.add('highlighted');
-                optionEl.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    input.value = opt;
-                    onChange(opt);
-                    panel.style.display = 'none';
+        const updateOptions = (filter = '') => {
+            panel.innerHTML = '';
+            const filteredOptions = options.filter(opt => opt.toLowerCase().includes(filter.toLowerCase()));
+            if (filteredOptions.length === 0) {
+                panel.innerHTML = `<div class="combobox-option text-slate-500">No results</div>`;
+            } else {
+                filteredOptions.forEach(opt => {
+                    const optionEl = document.createElement('div');
+                    optionEl.className = 'combobox-option'; optionEl.textContent = opt;
+                    if (opt === input.value) optionEl.classList.add('highlighted');
+                    optionEl.addEventListener('mousedown', (e) => {
+                        e.preventDefault(); input.value = opt;
+                        onChange(opt); panel.style.display = 'none';
+                    });
+                    panel.appendChild(optionEl);
                 });
-                panel.appendChild(optionEl);
-            });
-        }
-      };
-      input.addEventListener('input', () => { updateOptions(input.value); onChange(input.value); });
-      input.addEventListener('focus', () => { updateOptions(input.value); panel.style.display = 'block'; });
-      input.addEventListener('blur', () => { setTimeout(() => { panel.style.display = 'none'; }, 150); });
+            }
+        };
+        input.addEventListener('input', () => { updateOptions(input.value); onChange(input.value); });
+        input.addEventListener('focus', () => { updateOptions(input.value); panel.style.display = 'block'; });
+        input.addEventListener('blur', () => { setTimeout(() => { panel.style.display = 'none'; }, 150); });
 
-      wrapper.appendChild(input);
-      wrapper.appendChild(panel);
-      container.appendChild(wrapper);
+        editorWrapper.appendChild(input);
+        editorWrapper.appendChild(panel);
+      }
+      container.appendChild(editorWrapper);
     }
 
     function initializeTable(){
-      if (!selectedEmployee) {
-        editPrompt.classList.remove('hidden');
-        saveButton.disabled = true;
-      } else {
-        editPrompt.classList.add('hidden');
-      }
-
+      saveButton.disabled = true;
       tableBody.innerHTML="";
+
       employees.forEach(emp=>{
         const tr=document.createElement("tr");
         if(emp===selectedEmployee) tr.classList.add("selected-row");
         
-        tr.addEventListener("click", () => {
-            selectedEmployee = emp;
-            hasChanges = false; // Reset changes when switching rows
-            saveButton.disabled = true;
-            initializeTable();
+        tr.addEventListener("click", (e) => {
+            if (e.target.closest('.cell-editor-wrapper')) {
+                return;
+            }
+            if (selectedEmployee !== emp) {
+                selectedEmployee = emp;
+                hasChanges = false;
+                initializeTable();
+            }
         });
         
         const td=document.createElement("td");
@@ -358,9 +350,12 @@
       currentData = {};
       sSnap.forEach(d=>{currentData[d.id]=d.data();});
       const hSnap=await getDoc(doc(db,"settings","holidays"));
-      if(hSnap.exists()) holidays=hSnap.data().holidays||[];
+      if(hSnap.exists()) {
+        holidays=hSnap.data().holidays||[];
+      }
       setCurrentWeek(getMonday(today));
       loadingOverlay.style.display="none";
+      renderHolidays(); // Render holidays for settings page
     }
 
     saveButton.addEventListener("click",async()=>{
@@ -371,13 +366,60 @@
       hasChanges=false;
     });
 
-    // --- Navigation & Other Buttons ---
     document.getElementById("prev-week").addEventListener("click",()=>{const d=new Date(currentWeekStart);d.setDate(d.getDate()-7);setCurrentWeek(d);});
     document.getElementById("next-week").addEventListener("click",()=>{const d=new Date(currentWeekStart);d.setDate(d.getDate()+7);setCurrentWeek(d);});
     datePicker.addEventListener("change",()=>setCurrentWeek(getMonday(new Date(datePicker.value))));
     document.getElementById("today-button").addEventListener("click",()=>setCurrentWeek(getMonday(new Date())));
+
+    // FIX: Re-added Holidays UI and View Switching Logic
+    const holidaysContainer=document.getElementById("holidays-container");
+    const settingsSaveIndicator = document.getElementById("settings-save-indicator");
+
+    function renderHolidays(){
+      holidaysContainer.innerHTML="";
+      holidays.forEach((h,i)=>{
+        const div=document.createElement("div");div.className="flex items-center gap-2";
+        const inpDate=document.createElement("input");inpDate.type="date";inpDate.value=h.date;inpDate.className="form-input";inpDate.onchange=()=>{holidays[i].date=inpDate.value;};
+        const inpName=document.createElement("input");inpName.type="text";inpName.value=h.name;inpName.placeholder="Holiday name";inpName.className="form-input flex-1";inpName.oninput=()=>{holidays[i].name=inpName.value;};
+        const btn=document.createElement("button");
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>`;
+        btn.className="p-2 text-red-500 hover:bg-red-100 rounded-full transition-colors";
+        btn.onclick=()=>{holidays.splice(i,1);renderHolidays();};
+        div.append(inpDate,inpName,btn);holidaysContainer.appendChild(div);
+      });
+    }
+    document.getElementById("add-holiday-button").onclick=()=>{holidays.push({date:formatDateForStorage(today),name:""});renderHolidays();};
+    document.getElementById("settings-save-button").onclick=async()=>{
+      const btn = document.getElementById("settings-save-button");
+      btn.disabled = true;
+      await setDoc(doc(db,"settings","holidays"),{holidays});
+      settingsSaveIndicator.style.opacity=1;
+      setTimeout(()=>{
+        settingsSaveIndicator.style.opacity=0;
+        btn.disabled = false;
+        initializeTable(); // Refresh table to reflect holiday changes
+      }, 2500);
+    };
+
+    const scheduleView = document.getElementById("schedule-view");
+    const settingsView = document.getElementById("settings-view");
+    const navSchedule = document.getElementById("nav-schedule");
+    const navSettings = document.getElementById("nav-settings");
     
-    // --- Export Logic ---
+    navSchedule.onclick=()=>{
+        settingsView.classList.add("hidden");
+        scheduleView.classList.remove("hidden");
+        navSchedule.classList.add("active");
+        navSettings.classList.remove("active");
+    };
+    navSettings.onclick=()=>{
+        scheduleView.classList.add("hidden");
+        settingsView.classList.remove("hidden");
+        navSettings.classList.add("active");
+        navSchedule.classList.remove("active");
+    };
+    
+    // Export Logic
     const exportButton=document.getElementById("export-button");
     const exportPreview=document.getElementById("export-preview");
     const exportContent=document.getElementById("export-content");
@@ -386,7 +428,6 @@
     exportButton.addEventListener("click",async() => {
         const exportSource = document.getElementById("export-source");
         exportSource.innerHTML = '';
-        
         const title = document.createElement('h2');
         title.className = 'text-2xl font-bold text-slate-800 mb-6 text-center';
         title.textContent = "Weekly Schedule: " + getWeekDisplayText(currentWeekStart);
@@ -394,10 +435,8 @@
         
         const table = document.createElement('table');
         table.className = "min-w-full border-collapse border border-slate-300";
-
         const originalThead = document.querySelector("#schedule-view thead");
         table.appendChild(originalThead.cloneNode(true));
-
         const tbody = document.createElement('tbody');
         tbody.className = "bg-white";
         
@@ -408,7 +447,6 @@
             tdEmp.className = "px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-800 border-r border-slate-300";
             tdEmp.textContent = emp;
             tr.appendChild(tdEmp);
-
             currentWeekDates.forEach(d => {
                 const fd = formatDateForStorage(d);
                 const cell = document.createElement('td');
@@ -431,7 +469,7 @@
         exportSource.appendChild(table);
 
         try {
-            const canvas = await html2canvas(exportSource, { scale: 2, useCORS: true });
+            const canvas = await html2canvas(exportSource, { scale: 2, useCORS: true, logging: false });
             const img = document.createElement("img");
             img.src = canvas.toDataURL("image/png");
             img.className = "w-full h-auto object-contain";
