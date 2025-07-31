@@ -3,160 +3,168 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Work Schedule</title>
+  <title>SL Daily Work Report</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Minimalist Theme */
+    /* Sunrise Theme 🌅 */
     body { 
       font-family: 'Kanit', sans-serif; 
-      background-color: #f8fafc; /* slate-50 */
+      background-color: #fff7ed; 
     }
-    .main-card {
-      background: white;
-      border: 1px solid #e2e8f0; /* slate-200 */
-      border-radius: 1.5rem; /* 24px */
-      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    .glass-card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
     }
     .app-header { 
-      background: white; 
-      border-bottom: 1px solid #e2e8f0; /* slate-200 */
+      background: linear-gradient(135deg, #f43f5e, #f97316); 
     }
     .app-title {
-      font-weight: 700;
-      font-size: 1.75rem;
-      color: #1e293b; /* slate-800 */
+      font-weight: 700; font-size: 1.75rem;
+      background: linear-gradient(135deg, #ffffff, #fed7aa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     .nav-button {
-      border-radius: 0.5rem; /* 8px */
-      transition: all 0.2s ease;
-      font-weight: 500;
-      color: #475569; /* slate-600 */
+      border-radius: 9999px; transition: all 0.3s ease;
+      display: flex; align-items: center; gap: 0.5rem;
     }
-    .nav-button.active { 
-      background-color: #f1f5f9; /* slate-100 */
-      color: #0f172a; /* slate-900 */
-    }
-    .nav-button:hover:not(.active) { 
-      background-color: #f8fafc; /* slate-50 */
-    }
+    .nav-button.active { background-color: rgba(255, 255, 255, 0.25); font-weight: 600; }
+    .nav-button:hover:not(.active) { background-color: rgba(255, 255, 255, 0.1); }
     .btn {
-      border-radius: 0.75rem; /* 12px */
-      font-weight: 600;
-      font-size: 0.875rem; /* 14px */
-      padding: 0.625rem 1.25rem; /* 10px 20px */
+      border-radius: 12px; font-weight: 500;
       transition: all 0.2s ease-out;
-      border: 1px solid transparent;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border: none;
     }
-    .btn:disabled { cursor: not-allowed; opacity: 0.5; }
-    .btn-primary { 
-      background-color: #1e293b; /* slate-800 */
-      color: white; 
-    }
-    .btn-primary:hover:not(:disabled) { background-color: #0f172a; } /* slate-900 */
-    .btn-secondary { 
-      background-color: white;
-      color: #334155; /* slate-700 */
-      border-color: #cbd5e1; /* slate-300 */
-    }
-    .btn-secondary:hover:not(:disabled) { border-color: #94a3b8; background-color: #f8fafc; }
+    .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
+    .btn-primary { background: linear-gradient(135deg, #f43f5e, #fb923c); color: white; }
+    .btn-primary:hover:not(:disabled) { background: linear-gradient(135deg, #e11d48, #f97316); }
+    .btn-export { background: linear-gradient(135deg, #0891b2, #22d3ee); color: white; }
+    .btn-export:hover { background: linear-gradient(135deg, #0e7490, #0891b2); }
+    .btn-success { background: linear-gradient(135deg, #10b981, #34d399); color: white; }
+    .btn-success:hover { background: linear-gradient(135deg, #059669, #10b981); }
+    .btn-secondary { background-color: #e2e8f0; color: #475569; }
+    .btn-secondary:hover { background-color: #cbd5e1; }
     .table-container { 
-      border-radius: 1rem; /* 16px */
-      border: 1px solid #e2e8f0;
-      overflow: hidden;
+      border-radius: 16px; 
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+      overflow-x: auto;
     }
     tbody tr { transition: background-color 0.2s ease; cursor: pointer; }
-    tbody tr:not(.selected-row):hover { background-color: #f8fafc; /* slate-50 */ }
-    .selected-row { background-color: #f0f9ff !important; /* sky-50 */ }
-    .holiday-cell { background-color: #fef2f2; color: #b91c1c; font-weight: 500; }
-    .today-cell { border-left: 4px solid #3b82f6; background-color: #eff6ff; }
-    .today-header { border-bottom: 4px solid #3b82f6 !important; }
+    tbody tr:hover { background-color: #fff7ed; }
+    .selected-row { background-color: #fed7aa !important; color: #7c2d12; font-weight: 600; }
+    .holiday-cell { background-color: #fee2e2; color: #dc2626; font-weight: 500; }
+    .today-cell { background-color: #ffedd5; }
+    .today-header {
+      background: linear-gradient(135deg, #f43f5e, #f97316) !important;
+      color: white !important;
+    }
+    .today-header .date-header { color: white; font-weight: 600; }
     .form-input {
-      border: 1px solid #cbd5e1; /* slate-300 */
-      border-radius: 0.5rem;
-      padding: 0.75rem;
+      border: 1px solid #d1d5db; border-radius: 8px; padding: 0.75rem 0.75rem;
+      transition: all 0.2s ease;
       width: 100%;
-      font-size: 1rem; /* 16px */
     }
     .form-input:focus {
-      outline: none; 
-      border-color: #2563eb; /* blue-600 */
-      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+      outline: none; border-color: #f97316; box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.3);
     }
+    .combobox-panel {
+        display: none; position: absolute; z-index: 50; max-height: 160px; overflow-y: auto;
+        background: white; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        border: 1px solid #e5e7eb; margin-top: 4px; width: 100%;
+    }
+    .combobox-option { padding: 10px 12px; cursor: pointer; font-size: 1rem; }
+    .combobox-option:hover { background: #fff7ed; }
+    .combobox-option.highlighted { background: #ffedd5; color: #9a3412; }
     #export-source { position: absolute; left: -9999px; top: 0; font-family: 'Kanit', sans-serif; }
   </style>
 </head>
 <body class="text-slate-700">
-  <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-50">
-    <div class="w-16 h-16 border-4 border-slate-200 border-t-slate-500 rounded-full animate-spin"></div>
-    <p class="mt-4 text-slate-800 font-semibold text-lg">Loading Schedule...</p>
+  <div id="loading-overlay" class="fixed inset-0 bg-white/50 flex flex-col items-center justify-center z-50">
+    <div class="w-16 h-16 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin"></div>
+    <p class="mt-4 text-orange-800 font-semibold text-lg">เตรียมข้อมูลดีๆ สำหรับวันทำงานของคุณ...</p>
   </div>
 
   <div class="min-h-screen flex flex-col">
-    <header class="app-header shadow-sm sticky top-0 z-30">
+    <header class="app-header shadow-lg sticky top-0 z-30">
         <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <h1 class="app-title">Work Schedule</h1>
+            <h1 class="app-title">SL Daily Work Report ☀️</h1>
         </div>
-        <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-            <nav class="flex space-x-2 border-b border-transparent">
-                <button id="nav-schedule" class="px-4 py-3 text-sm nav-button active"><span>Schedule</span></button>
-                <button id="nav-settings" class="px-4 py-3 text-sm nav-button"><span>Settings</span></button>
+        <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pb-3">
+            <nav class="flex space-x-2">
+                <button id="nav-schedule" class="px-4 py-2 text-sm font-medium nav-button active">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" /></svg>
+                    <span>Schedule</span>
+                </button>
+                <button id="nav-settings" class="px-4 py-2 text-sm font-medium nav-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.532 1.532 0 012.287-.947c1.372.836 2.942-.734-2.106-2.106a1.532 1.532 0 01.947-2.287c1.561-.379-1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
+                    <span>Settings</span>
+                </button>
             </nav>
         </div>
     </header>
 
     <main class="flex-grow max-w-screen-xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div id="schedule-view" class="main-card p-4 md:p-6 lg:p-8">
-        <div class="flex flex-col md:flex-row justify-between md:items-center mb-8 gap-4">
+      <div id="schedule-view" class="glass-card p-4 md:p-6 lg:p-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <h2 class="text-2xl font-bold text-slate-800">Weekly Schedule</h2>
-          <div class="flex items-center space-x-3 self-end md:self-center">
-            <span id="save-indicator" class="text-sm text-green-600 font-medium opacity-0 save-indicator"></span>
-            <button id="save-button" class="btn btn-primary" disabled>Save Changes</button>
+          <div class="flex items-center space-x-3 self-end sm:self-center">
+            <span id="save-indicator" class="text-sm text-green-600 font-semibold opacity-0 save-indicator"></span>
+            <button id="export-button" class="px-4 py-2 text-sm btn btn-export flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
+              <span>Export</span>
+            </button>
+            <button id="save-button" class="px-4 py-2 text-sm btn btn-primary" disabled>Save Changes</button>
           </div>
         </div>
 
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 flex-wrap">
-          <div class="flex items-center rounded-lg p-1">
-            <button id="prev-week" class="p-2 rounded-md hover:bg-slate-100 transition-colors">
-              <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 flex-wrap">
+          <div class="flex items-center bg-orange-100 rounded-full p-1">
+            <button id="prev-week" class="p-2 rounded-full hover:bg-orange-200 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </button>
-            <span id="week-display" class="font-semibold text-slate-700 px-4 text-center text-base"></span>
-            <button id="next-week" class="p-2 rounded-md hover:bg-slate-100 transition-colors">
-              <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            <span id="week-display" class="font-semibold text-orange-800 px-4 text-center text-sm sm:text-base"></span>
+            <button id="next-week" class="p-2 rounded-full hover:bg-orange-200 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
-          <div class="flex items-center space-x-3">
-            <input type="date" id="date-picker" class="form-input w-auto text-sm py-2"/>
-            <button id="today-button" class="btn btn-secondary">Today</button>
-            <button id="export-button" class="btn btn-secondary">Export</button>
+          <div class="flex items-center space-x-2">
+            <input type="date" id="date-picker" class="form-input w-auto"/>
+            <button id="today-button" class="btn btn-secondary px-4 py-2">Today</button>
           </div>
         </div>
         
         <div class="table-container">
-          <table class="min-w-full">
-            <thead class="bg-slate-50 z-20">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-100 z-20">
               <tr>
-                <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600 sticky left-0 bg-slate-50 z-20">Employee</th>
-                <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600" id="monday-header">Monday <span class="block text-xs font-normal text-slate-400 date-header"></span></th>
-                <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600" id="tuesday-header">Tuesday <span class="block text-xs font-normal text-slate-400 date-header"></span></th>
-                <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600" id="wednesday-header">Wednesday <span class="block text-xs font-normal text-slate-400 date-header"></span></th>
-                <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600" id="thursday-header">Thursday <span class="block text-xs font-normal text-slate-400 date-header"></span></th>
-                <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600" id="friday-header">Friday <span class="block text-xs font-normal text-slate-400 date-header"></span></th>
+                <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider sticky left-0 bg-gray-100 z-20">Employee</th>
+                <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider" id="monday-header">Monday <span class="block date-header font-medium normal-case text-slate-500"></span></th>
+                <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider" id="tuesday-header">Tuesday <span class="block date-header font-medium normal-case text-slate-500"></span></th>
+                <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider" id="wednesday-header">Wednesday <span class="block date-header font-medium normal-case text-slate-500"></span></th>
+                <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider" id="thursday-header">Thursday <span class="block date-header font-medium normal-case text-slate-500"></span></th>
+                <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider" id="friday-header">Friday <span class="block date-header font-medium normal-case text-slate-500"></span></th>
               </tr>
             </thead>
-            <tbody id="schedule-table-body" class="bg-white"></tbody>
+            <tbody id="schedule-table-body" class="bg-white divide-y divide-gray-200"></tbody>
           </table>
         </div>
       </div>
       
-      <div id="settings-view" class="main-card p-6 lg:p-8 hidden">
-        <h2 class="text-2xl font-bold text-slate-800 mb-8">Settings - Holidays</h2>
+      <div id="settings-view" class="glass-card p-6 lg:p-8 hidden">
+        <h2 class="text-2xl font-bold text-slate-800 mb-6">Settings - Holidays</h2>
         <div id="holidays-container" class="space-y-4"></div>
-        <div class="mt-8 flex items-center gap-4 border-t border-slate-200 pt-6">
-          <button id="add-holiday-button" class="btn btn-secondary">Add Holiday</button>
-          <button id="settings-save-button" class="btn btn-primary">Save Settings</button>
-          <span id="settings-save-indicator" class="ml-3 text-green-600 font-medium opacity-0 save-indicator"></span>
+        <div class="mt-6 flex items-center gap-4">
+          <button id="add-holiday-button" class="btn btn-secondary px-4 py-2">Add Holiday</button>
+          <button id="settings-save-button" class="btn btn-primary px-4 py-2">Save Settings</button>
+          <span id="settings-save-indicator" class="ml-3 text-green-600 font-semibold opacity-0 save-indicator"></span>
         </div>
       </div>
     </main>
@@ -164,14 +172,14 @@
   
   <div id="export-source"></div>
 
-  <div id="export-preview" class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden">
-    <div class="main-card w-full max-w-5xl h-full max-h-[90vh] flex flex-col p-4 gap-4">
-      <div id="export-content" class="flex-grow rounded-xl overflow-y-auto bg-slate-50 p-2">
+  <div id="export-preview" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 hidden">
+    <div class="export-container glass-card w-full max-w-5xl h-full max-h-[90vh] flex flex-col p-4 gap-4">
+      <div id="export-content" class="flex-grow rounded-xl overflow-y-auto bg-white p-2">
       </div>
-       <button class="export-close absolute -top-2 -right-2 bg-slate-700 text-white w-9 h-9 rounded-full flex items-center justify-center cursor-pointer font-bold hover:bg-slate-900 transition z-10">✕</button>
-      <div class="flex-shrink-0 flex justify-center gap-4 pt-4 border-t border-slate-200">
-        <button id="download-image" class="btn btn-primary">Download</button>
-        <button id="copy-image" class="btn btn-secondary">Copy to Clipboard</button>
+       <button class="export-close absolute -top-2 -right-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center cursor-pointer font-bold hover:bg-red-600 transition-transform hover:scale-110 z-10" id="export-close">✕</button>
+      <div class="flex-shrink-0 flex justify-center gap-4">
+        <button id="download-image" class="btn btn-primary px-5 py-2">Download</button>
+        <button id="copy-image" class="btn btn-success px-5 py-2">Copy</button>
       </div>
     </div>
   </div>
@@ -220,12 +228,43 @@
       
       const input = document.createElement('input');
       input.type = 'text'; 
-      input.className = 'form-input py-2 text-base';
+      input.className = 'form-input';
       input.value = initialValue || ''; 
-      input.placeholder = 'Select or type...';
+      input.placeholder = '-- พิมพ์หรือเลือก --';
 
-      input.addEventListener('input', () => onChange(input.value));
+      const panel = document.createElement('div');
+      panel.className = 'combobox-panel';
+
+      const updateOptions = (filter = '') => {
+          panel.innerHTML = '';
+          const filteredOptions = options.filter(opt => opt.toLowerCase().includes(filter.toLowerCase()));
+          if (filteredOptions.length === 0) {
+              panel.innerHTML = `<div class="combobox-option text-slate-500">No results</div>`;
+          } else {
+              filteredOptions.forEach(opt => {
+                  const optionEl = document.createElement('div');
+                  optionEl.className = 'combobox-option'; 
+                  optionEl.textContent = opt;
+                  if (opt === input.value) optionEl.classList.add('highlighted');
+                  optionEl.addEventListener('mousedown', (e) => {
+                      e.preventDefault(); 
+                      input.value = opt;
+                      onChange(opt); 
+                      panel.style.display = 'none';
+                  });
+                  panel.appendChild(optionEl);
+              });
+          }
+      };
+      input.addEventListener('input', () => { 
+        updateOptions(input.value); 
+        onChange(input.value);
+      });
+      input.addEventListener('focus', () => { updateOptions(input.value); panel.style.display = 'block'; });
+      input.addEventListener('blur', () => { setTimeout(() => { panel.style.display = 'none'; }, 200); });
+
       editorWrapper.appendChild(input);
+      editorWrapper.appendChild(panel);
       container.appendChild(editorWrapper);
     }
 
@@ -235,7 +274,6 @@
 
       employees.forEach(emp=>{
         const tr=document.createElement("tr");
-        tr.className = "border-b border-slate-100";
         if(emp===selectedEmployee) tr.classList.add("selected-row");
         
         tr.addEventListener("click", (e) => {
@@ -248,20 +286,20 @@
         });
         
         const td=document.createElement("td");
-        td.className="px-6 py-5 text-base font-medium text-slate-700 sticky left-0 z-10";
+        td.className="px-6 py-4 whitespace-nowrap text-sm font-medium sticky left-0 z-10";
         td.textContent=emp;
-        td.style.backgroundColor = tr.classList.contains('selected-row') ? '#f0f9ff' : '#ffffff';
+        td.style.backgroundColor = tr.classList.contains('selected-row') ? '#fed7aa' : '#ffffff';
         tr.appendChild(td);
 
         daysOfWeek.forEach((day,i)=>{
           const d=currentWeekDates[i];
           const fd=formatDateForStorage(d);
           const cell=document.createElement("td");
-          cell.className="px-6 py-3 whitespace-nowrap text-base text-slate-600";
+          cell.className="px-2 sm:px-6 py-2 whitespace-nowrap text-sm";
           
           if(isHoliday(d)){
-            cell.innerHTML=`<span class="font-medium text-red-700">Holiday:</span> ${getHolidayName(d)}`;
-            cell.classList.add("bg-red-50/50");
+            cell.textContent="Holiday: "+getHolidayName(d);
+            cell.className+=" holiday-cell";
           } else {
             const val=currentData[emp]?.[fd]||"";
             if(emp===selectedEmployee){
@@ -275,7 +313,7 @@
               cell.textContent=val;
             }
           }
-          if(isSameDay(d,today) && !isHoliday(d)) cell.classList.add("today-cell");
+          if(isSameDay(d,today)) cell.classList.add("today-cell");
           tr.appendChild(cell);
         });
         tableBody.appendChild(tr);
@@ -296,35 +334,24 @@
       });
       initializeTable();
     }
-    
-    // FIX: Added try-catch-finally block to handle loading errors gracefully
-    async function fetchData() {
-        loadingOverlay.style.display = "flex";
-        try {
-            const sSnap = await getDocs(collection(db, "schedules"));
-            currentData = {};
-            sSnap.forEach(d => { currentData[d.id] = d.data(); });
 
-            const hSnap = await getDoc(doc(db, "settings", "holidays"));
-            holidays = (hSnap.exists() && hSnap.data().holidays) ? hSnap.data().holidays : [];
-
-            setCurrentWeek(getMonday(today));
-            renderHolidays();
-        } catch (error) {
-            console.error("Error fetching data from Firebase:", error);
-            alert("Could not load data. Please check your internet connection or Firebase setup.\n\nError: " + error.message);
-        } finally {
-            // This will always run, ensuring the loading screen is hidden.
-            loadingOverlay.style.display = "none";
-        }
+    async function fetchData(){
+      loadingOverlay.style.display="flex";
+      const sSnap=await getDocs(collection(db,"schedules"));
+      currentData = {};
+      sSnap.forEach(d=>{currentData[d.id]=d.data();});
+      const hSnap=await getDoc(doc(db,"settings","holidays"));
+      if(hSnap.exists()) { holidays=hSnap.data().holidays||[]; }
+      setCurrentWeek(getMonday(today));
+      loadingOverlay.style.display="none";
+      renderHolidays();
     }
-
 
     saveButton.addEventListener("click",async()=>{
       if(!selectedEmployee||!hasChanges)return;
       saveButton.disabled=true;saveButton.textContent="Saving...";
       await setDoc(doc(db,"schedules",selectedEmployee),currentData[selectedEmployee]||{},{merge:true});
-      saveIndicator.textContent = "Saved!";
+      saveIndicator.textContent = "อัปเดตเรียบร้อย!";
       saveIndicator.style.opacity=1;
       setTimeout(() => {
         saveIndicator.style.opacity = 0;
@@ -345,21 +372,22 @@
       holidaysContainer.innerHTML="";
       holidays.forEach((h,i)=>{
         const div=document.createElement("div");
+        // FIX: Adjust width of date/name inputs
         div.className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full";
         
         const inpDate=document.createElement("input");
         inpDate.type="date";inpDate.value=h.date;
-        inpDate.className="form-input sm:w-44";
+        inpDate.className="form-input sm:w-48"; // Fixed width on desktop
         inpDate.onchange=()=>{holidays[i].date=inpDate.value;};
         
         const inpName=document.createElement("input");
-        inpName.type="text";inpName.value=h.name;inpName.placeholder="Holiday Name";
-        inpName.className="form-input w-full flex-1";
+        inpName.type="text";inpName.value=h.name;inpName.placeholder="Holiday name";
+        inpName.className="form-input w-full sm:flex-1";
         inpName.oninput=()=>{holidays[i].name=inpName.value;};
 
         const btn=document.createElement("button");
-        btn.innerHTML = `<svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>`;
-        btn.className="p-3 text-slate-400 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors self-end sm:self-center flex-shrink-0";
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>`;
+        btn.className="p-2 text-red-500 hover:bg-red-100 rounded-full transition-colors self-end sm:self-center flex-shrink-0";
         btn.onclick=()=>{holidays.splice(i,1);renderHolidays();};
         
         div.append(inpDate,inpName,btn);
@@ -371,7 +399,7 @@
       const btn = document.getElementById("settings-save-button");
       btn.disabled = true;
       await setDoc(doc(db,"settings","holidays"),{holidays});
-      settingsSaveIndicator.textContent = "Settings Saved!";
+      settingsSaveIndicator.textContent = "อัปเดตเรียบร้อย!";
       settingsSaveIndicator.style.opacity=1;
       setTimeout(()=>{
         settingsSaveIndicator.style.opacity=0;
@@ -398,6 +426,7 @@
         navSchedule.classList.remove("active");
     };
     
+    // FIX: New Export UI Generation
     const exportButton=document.getElementById("export-button");
     const exportPreview=document.getElementById("export-preview");
     const exportContent=document.getElementById("export-content");
@@ -406,28 +435,28 @@
     exportButton.addEventListener("click",async() => {
         const exportSource = document.getElementById("export-source");
         exportSource.innerHTML = '';
-        exportSource.className = "p-10 bg-white w-[1200px]";
+        exportSource.className = "p-8 bg-orange-50 w-[1200px]"; // Use a fixed-width container for consistent export
         
         const header = document.createElement('div');
-        header.className = "mb-8";
+        header.className = "mb-8 text-center";
         header.innerHTML = `
-          <h1 class="text-4xl font-bold text-slate-900">Weekly Work Schedule</h1>
-          <p class="text-2xl text-slate-500 mt-1">${getWeekDisplayText(currentWeekStart)}</p>
+          <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-500">Weekly Work Report</h1>
+          <p class="text-xl text-slate-600 mt-2">${getWeekDisplayText(currentWeekStart)}</p>
         `;
         exportSource.appendChild(header);
         
         const table = document.createElement('table');
-        table.className = "w-full border-collapse text-left";
+        table.className = "min-w-full border-collapse text-left";
         
         const thead = document.createElement('thead');
         thead.innerHTML = `
-          <tr class="border-b-2 border-slate-300">
-            <th class="p-4 text-base font-semibold text-slate-800">Employee</th>
-            <th class="p-4 text-base font-semibold text-slate-800">Monday <span class="text-slate-400 font-normal">(${formatDate(currentWeekDates[0])})</span></th>
-            <th class="p-4 text-base font-semibold text-slate-800">Tuesday <span class="text-slate-400 font-normal">(${formatDate(currentWeekDates[1])})</span></th>
-            <th class="p-4 text-base font-semibold text-slate-800">Wednesday <span class="text-slate-400 font-normal">(${formatDate(currentWeekDates[2])})</span></th>
-            <th class="p-4 text-base font-semibold text-slate-800">Thursday <span class="text-slate-400 font-normal">(${formatDate(currentWeekDates[3])})</span></th>
-            <th class="p-4 text-base font-semibold text-slate-800">Friday <span class="text-slate-400 font-normal">(${formatDate(currentWeekDates[4])})</span></th>
+          <tr class="border-b-2 border-orange-200">
+            <th class="p-4 text-sm font-bold uppercase text-orange-900/80">Employee</th>
+            <th class="p-4 text-sm font-bold uppercase text-orange-900/80">Monday (${formatDate(currentWeekDates[0])})</th>
+            <th class="p-4 text-sm font-bold uppercase text-orange-900/80">Tuesday (${formatDate(currentWeekDates[1])})</th>
+            <th class="p-4 text-sm font-bold uppercase text-orange-900/80">Wednesday (${formatDate(currentWeekDates[2])})</th>
+            <th class="p-4 text-sm font-bold uppercase text-orange-900/80">Thursday (${formatDate(currentWeekDates[3])})</th>
+            <th class="p-4 text-sm font-bold uppercase text-orange-900/80">Friday (${formatDate(currentWeekDates[4])})</th>
           </tr>
         `;
         table.appendChild(thead);
@@ -435,27 +464,29 @@
         const tbody = document.createElement('tbody');
         employees.forEach((emp, index) => {
             const tr = document.createElement('tr');
-            tr.className = "border-b border-slate-200";
+            tr.className = "border-b border-orange-100";
+            if(index % 2 !== 0) { // Zebra stripes
+              tr.classList.add("bg-orange-50/50");
+            }
 
             const tdEmp = document.createElement('td');
-            tdEmp.className = "p-4 text-lg font-medium text-slate-700";
+            tdEmp.className = "p-4 whitespace-nowrap text-sm font-medium text-slate-800";
             tdEmp.textContent = emp;
             tr.appendChild(tdEmp);
 
             currentWeekDates.forEach(d => {
                 const fd = formatDateForStorage(d);
                 const cell = document.createElement('td');
-                cell.className = "p-4 text-lg text-slate-600";
+                cell.className = "p-4 whitespace-nowrap text-sm text-slate-600";
                 
                 if (isHoliday(d)) {
-                    const holidayName = getHolidayName(d);
-                    cell.innerHTML = `<span class="font-semibold text-red-700">Holiday</span>${holidayName ? `: ${holidayName}` : ''}`;
-                    cell.classList.add("bg-red-50");
+                    cell.textContent = getHolidayName(d) || 'Holiday';
+                    cell.className += " font-semibold text-red-600";
                 } else {
                     cell.textContent = currentData[emp]?.[fd] || '-';
                 }
                 if (isSameDay(d, today)) {
-                    cell.classList.add("bg-blue-50", "font-bold");
+                    cell.className += " font-bold text-orange-700";
                 }
                 tr.appendChild(cell);
             });
@@ -465,8 +496,8 @@
         exportSource.appendChild(table);
 
         const footer = document.createElement('p');
-        footer.className = "mt-8 text-sm text-slate-400 text-center";
-        footer.textContent = `Generated by Work Scheduler on ${new Date().toLocaleDateString()}`;
+        footer.className = "mt-6 text-xs text-slate-400 text-center";
+        footer.textContent = `Generated by SL Work Report on ${new Date().toLocaleDateString()}`;
         exportSource.appendChild(footer);
 
         try {
@@ -479,7 +510,7 @@
             exportPreview.classList.remove("hidden");
         } catch(e) {
             console.error("Error during export:", e);
-            alert("An error occurred while creating the image. Please try again.");
+            alert("เกิดข้อผิดพลาดในการสร้างรูปภาพ กรุณาลองใหม่อีกครั้ง");
         } finally {
             exportSource.innerHTML = '';
         }
@@ -489,7 +520,7 @@
     document.getElementById("download-image").addEventListener("click",()=>{
         const img=exportContent.querySelector("img");if(!img)return;
         const link=document.createElement("a");
-        link.download=`Work_Schedule_${formatDateForStorage(currentWeekStart)}.png`;
+        link.download=`SL_Schedule_${formatDateForStorage(currentWeekStart)}.png`;
         link.href=img.src;link.click();
     });
     document.getElementById("copy-image").addEventListener("click",async()=>{
@@ -497,10 +528,10 @@
             const img=exportContent.querySelector("img");if(!img)return;
             const blob=await (await fetch(img.src)).blob();
             await navigator.clipboard.write([new ClipboardItem({[blob.type]:blob})]);
-            alert("Image copied to clipboard!");
+            alert("คัดลอกรูปภาพไปยังคลิปบอร์ดแล้ว!");
         } catch(err) {
             console.error("Failed to copy image: ", err);
-            alert("Could not copy image. Please use the Download button instead.");
+            alert("ไม่สามารถคัดลอกรูปภาพได้ กรุณาลองใช้เบราว์เซอร์อื่น หรือดาวน์โหลดแทน");
         }
     });
 
