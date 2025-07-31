@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SL Daily Work Report</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; background-color: #f0f4ff; }
+    .table-container { overflow-x: auto; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -5px rgba(59, 130, 246, 0.05);}
+    .selected-row { background-color: #e0f2fe !important; }
+    .editable:focus { outline: 2px solid #6366f1; background-color: #ffffff; }
+    .save-indicator { transition: opacity 0.3s ease-in-out; }
+    .holiday-cell { background-color: #fef2f2; color: #ef4444; font-weight: 500; }
+    .custom-combobox { position: relative; width: 100%; }
+    .custom-combobox-input { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 12px; font-size: 0.875rem; }
+    .custom-combobox-input:focus { outline: 2px solid #6366f1; border-color: #6366f1; }
+    .custom-combobox-toggle { position: absolute; right: 0; top: 0; bottom: 0; display: flex; align-items: center; padding: 0 0.5rem; background: transparent; border: none; cursor: pointer;}
+    .custom-combobox-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 10; background: white; border: 1px solid #d1d5db; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 200px; overflow-y: auto; display: none;}
+    .custom-combobox-dropdown.show { display: block; }
+    .custom-combobox-option { padding: 0.5rem; cursor: pointer; font-size: 0.875rem; }
+    .custom-combobox-option:hover { background-color: #f3f4f6; }
+    .date-header { font-size: 0.75rem; color: #6b7280; display: block; margin-top: 0.25rem; }
+    .week-nav { display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
+    .week-nav-button { display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border-radius: 9999px; background-color: #f3f4f6; color: #4b5563; cursor: pointer; transition: all 0.2s;}
+    .week-nav-button:hover { background-color: #e5e7eb; color: #1f2937; }
+    .week-nav-button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .week-display { font-weight: 600; padding: 0 1rem; color: #4f46e5; }
+    .today-header { background: linear-gradient(135deg, #c7d2fe, #a5b4fc) !important; color: #4338ca !important; }
+    .today-header .date-header { color: #4338ca; font-weight: 600; }
+    .today-cell { background-color: #f5f3ff; }
+    .today-indicator { display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; font-size: 0.625rem; font-weight: 600; padding: 0.125rem 0.375rem; border-radius: 9999px; margin-left: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;}
+    .app-header { background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; }
+    .app-title { background: linear-gradient(135deg, #ffffff, #e0e7ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .nav-button { border-radius: 12px; transition: all 0.2s; }
+    .nav-button.active { background: rgba(255, 255, 255, 0.2); }
+    .nav-button:hover:not(.active) { background: rgba(255, 255, 255, 0.1); }
+    .card { border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1); }
+    .btn { border-radius: 12px; font-weight: 500; transition: all 0.2s; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: linear-gradient(135deg, #4f46e5, #6366f1); }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-export { background: linear-gradient(135deg, #f97316, #fb923c); color: white;}
+    .btn-export:hover { opacity: 0.9; }
+    .table-header { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); }
+    .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000;}
+    .loading-spinner { width: 50px; height: 50px; border: 5px solid #e5e7eb; border-top: 5px solid #6366f1; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;}
+    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+  </style>
+</head>
+<body>
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p class="text-lg font-medium text-gray-700">Loading schedule...</p>
+  </div>
+
+  <div class="min-h-screen flex flex-col">
+    <header class="app-header shadow-md">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold app-title">SL Daily Work Report</h1>
+        <div class="flex items-center space-x-4">
+          <label for="employee-select" class="text-sm text-white">Select your name:</label>
+          <select id="employee-select" class="block w-48 pl-3 pr-10 py-2 text-base border-0 focus:ring-2 focus:ring-indigo-300 rounded-xl">
+            <option value="" selected disabled>Choose name</option>
+            <option>P'Nuth</option><option>P'Note</option><option>P'Poom</option><option>P'O</option><option>Tew</option><option>PView</option><option>P'Bas</option><option>Big</option><option>Aim</option><option>Gib</option><option>Nut</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-8">
+      <div id="schedule-view" class="bg-white rounded-2xl shadow-lg p-6 card">
+        <div class="flex justify-between mb-6">
+          <h2 class="text-xl font-semibold">Weekly Schedule</h2>
+          <div class="flex items-center space-x-3">
+            <span id="save-indicator" class="text-sm text-green-600 opacity-0 save-indicator">Saved!</span>
+            <button id="save-button" class="px-4 py-2 text-sm text-white btn btn-primary" disabled>Save Changes</button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="table-header">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs">Employee</th>
+                <th id="monday-header" class="px-6 py-3">Monday<span class="date-header"></span></th>
+                <th id="tuesday-header" class="px-6 py-3">Tuesday<span class="date-header"></span></th>
+                <th id="wednesday-header" class="px-6 py-3">Wednesday<span class="date-header"></span></th>
+                <th id="thursday-header" class="px-6 py-3">Thursday<span class="date-header"></span></th>
+                <th id="friday-header" class="px-6 py-3">Friday<span class="date-header"></span></th>
+              </tr>
+            </thead>
+            <tbody id="schedule-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getFirestore, collection, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAt7Fia37IluL7EC3I8-dHLZozhrCH3n8E",
+  authDomain: "sl-daily-work-report.firebaseapp.com",
+  projectId: "sl-daily-work-report",
+  storageBucket: "sl-daily-work-report.firebasestorage.app",
+  messagingSenderId: "728057348052",
+  appId: "1:728057348052:web:b67f4b9d813cc8fbe72041",
+  measurementId: "G-KPNES7BES6"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const employees = ["P'Nuth","P'Note","P'Poom","P'O","Tew","PView","P'Bas","Big","Aim","Gib","Nut"];
+const daysOfWeek = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
+const defaultLocations = ["Enco","BPO","Amata","Rst","Training","Office","WFH","Leave"];
+let selectedEmployee = null, currentData = {}, today=new Date(), currentWeekDates=[];
+const tableBody=document.getElementById('schedule-table-body'), saveButton=document.getElementById('save-button'), saveIndicator=document.getElementById('save-indicator'), employeeSelect=document.getElementById('employee-select');
+
+function formatDate(date){return date.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+function formatDateForStorage(date){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;}
+function getMonday(d){const date=new Date(d);const day=date.getDay();const diff=date.getDate()-day+(day===0?-6:1);return new Date(date.setDate(diff));}
+function isSameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+
+function createCombobox(container, initialValue, options, onChange){
+  const wrapper=document.createElement('div');wrapper.className='custom-combobox';
+  const input=document.createElement('input');input.type='text';input.className='custom-combobox-input';input.value=initialValue||'';
+  const toggleBtn=document.createElement('button');toggleBtn.type='button';toggleBtn.className='custom-combobox-toggle';toggleBtn.innerHTML='▼';
+  const dropdown=document.createElement('div');dropdown.className='custom-combobox-dropdown';
+  options.forEach(option=>{const opt=document.createElement('div');opt.className='custom-combobox-option';opt.textContent=option;
+    opt.addEventListener('click',()=>{input.value=option;dropdown.classList.remove('show');onChange(option);});dropdown.appendChild(opt);});
+  toggleBtn.addEventListener('click',()=>dropdown.classList.toggle('show'));
+  document.addEventListener('click',(e)=>{if(!wrapper.contains(e.target))dropdown.classList.remove('show');});
+  input.addEventListener('input',()=>onChange(input.value));input.addEventListener('focus',()=>dropdown.classList.add('show'));
+  wrapper.append(input,toggleBtn,dropdown);container.append(wrapper);
+}
+
+function initializeTable(){
+  tableBody.innerHTML='';
+  employees.forEach(emp=>{
+    const row=document.createElement('tr');row.className=emp===selectedEmployee?'selected-row':'';
+    const nameCell=document.createElement('td');nameCell.className='px-6 py-4 text-sm';nameCell.textContent=emp;row.append(nameCell);
+    for(let i=0;i<5;i++){
+      const date=currentWeekDates[i], formattedDate=formatDateForStorage(date);
+      const dayCell=document.createElement('td');dayCell.className='px-6 py-4 text-sm';if(isSameDay(date,today))dayCell.classList.add('today-cell');
+      const value=currentData[emp]?.[formattedDate]||'';
+      if(emp===selectedEmployee){
+        const comboboxContainer=document.createElement('div');
+        createCombobox(comboboxContainer,value,defaultLocations,(v)=>{if(!currentData[emp])currentData[emp]={};currentData[emp][formattedDate]=v;saveButton.disabled=false;});
+        dayCell.appendChild(comboboxContainer);
+      } else {dayCell.textContent=value;}
+      row.append(dayCell);
+    }
+    tableBody.append(row);
+  });
+}
+
+employeeSelect.addEventListener('change',()=>{selectedEmployee=employeeSelect.value;initializeTable();});
+saveButton.addEventListener('click',async()=>{
+  if(!selectedEmployee)return;
+  await setDoc(doc(db,"schedules",selectedEmployee),currentData[selectedEmployee]||{}, {merge:true});
+  saveIndicator.style.opacity='1';setTimeout(()=>saveIndicator.style.opacity='0',2000);saveButton.disabled=true;
+});
+
+async function fetchData(){
+  const snap=await getDocs(collection(db,"schedules"));
+  snap.forEach(docSnap=>currentData[docSnap.id]=docSnap.data());
+  const weekStart=getMonday(today);currentWeekDates=[];
+  for(let i=0;i<5;i++){const d=new Date(weekStart);d.setDate(d.getDate()+i);currentWeekDates.push(d);
+    const header=document.getElementById(`${daysOfWeek[i].toLowerCase()}-header`);header.querySelector('.date-header').textContent=formatDate(d);}
+  initializeTable();document.getElementById('loading-overlay').style.display='none';
+}
+fetchData();
+</script>
+</body>
+</html>
