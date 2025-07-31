@@ -543,7 +543,8 @@
                 cell.className = "p-4 whitespace-nowrap text-sm text-slate-600";
                 
                 if (isHoliday(d)) {
-                    cell.textContent = getHolidayName(d) || 'Holiday';
+                    // MODIFIED LINE: Always show "Holiday" instead of the specific name
+                    cell.textContent = 'Holiday'; 
                     cell.className += " font-semibold text-pink-700";
                 } else {
                     cell.textContent = currentData[emp]?.[fd] || '-';
