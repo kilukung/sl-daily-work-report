@@ -268,7 +268,18 @@
     const daysOfWeek = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
     const defaultLocations = ["Enco","BPO","Amata","Rst","Training","Office","WFH","Leave"];
     let selectedEmployee=null, hasChanges=false, currentData={}, holidays=[], currentWeekDates=[], currentWeekStart=null;
-    const today=new Date();
+    
+    // MODIFIED LOGIC: Determine initial date based on the day of the week
+    const today = new Date();
+    let initialDate = new Date(); // Use a mutable copy of today's date
+    const dayOfWeek = today.getDay(); // 0 for Sunday, 6 for Saturday
+
+    if (dayOfWeek === 6) { // If it's Saturday, show next week
+      initialDate.setDate(today.getDate() + 2);
+    } else if (dayOfWeek === 0) { // If it's Sunday, show next week
+      initialDate.setDate(today.getDate() + 1);
+    }
+    // On weekdays, initialDate remains today
 
     const loadingOverlay=document.getElementById("loading-overlay");
     const tableBody=document.getElementById("schedule-table-body");
@@ -407,7 +418,10 @@
       sSnap.forEach(d=>{currentData[d.id]=d.data();});
       const hSnap=await getDoc(doc(db,"settings","holidays"));
       if(hSnap.exists()) { holidays=hSnap.data().holidays||[]; }
-      setCurrentWeek(getMonday(today));
+      
+      // Use the pre-calculated initialDate for the first load
+      setCurrentWeek(getMonday(initialDate));
+      
       loadingOverlay.style.display="none";
       renderHolidays();
     }
@@ -458,7 +472,7 @@
         holidaysContainer.appendChild(div);
       });
     }
-    document.getElementById("add-holiday-button").onclick=()=>{holidays.push({date:formatDateForStorage(today),name:""});renderHolidays();};
+    document.getElementById("add-holiday-button").onclick=()=>{holidays.push({date:formatDateForStorage(new Date()),name:""});renderHolidays();};
     document.getElementById("settings-save-button").onclick=async()=>{
       const btn = document.getElementById("settings-save-button");
       btn.disabled = true;
@@ -543,7 +557,6 @@
                 cell.className = "p-4 whitespace-nowrap text-sm text-slate-600";
                 
                 if (isHoliday(d)) {
-                    // MODIFIED LINE: Always show "Holiday" instead of the specific name
                     cell.textContent = 'Holiday'; 
                     cell.className += " font-semibold text-pink-700";
                 } else {
