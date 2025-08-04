@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SL Daily Work Report</title>
+  
+  <link rel="manifest" href="manifest.json">
+  
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  
+  <meta name="theme-color" content="#1a1a1a">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -290,10 +296,13 @@
       editorWrapper.appendChild(input);
       editorWrapper.appendChild(panel);
       container.appendChild(editorWrapper);
-      input.focus();
+      if (window.innerWidth < 768) {
+          // Don't auto-focus on mobile as it can be jarring
+      } else {
+         input.focus();
+      }
     }
     
-    // --- NEW: Mobile Editor UI ---
     function renderMobileEditor(emp) {
         mobileEditor.innerHTML = ''; // Clear previous
         mobileEditor.classList.remove('hidden');
@@ -345,19 +354,17 @@
     function initializeTable(){
         saveButton.disabled = true;
         tableBody.innerHTML="";
-        mobileEditor.innerHTML=""; // Clear mobile editor
-        mobileEditor.classList.add('hidden'); // Hide it
-        tableContainer.classList.remove('hidden'); // Show table
-        dateControls.classList.remove('hidden'); // Show date controls
+        mobileEditor.innerHTML="";
+        mobileEditor.classList.add('hidden');
+        tableContainer.classList.remove('hidden');
+        dateControls.classList.remove('hidden');
         viewTitle.textContent = 'Weekly Schedule';
 
 
-        // --- UI LOGIC ---
-        // On mobile, if an employee is selected, show the editor. Otherwise, show the table.
         const isMobile = window.innerWidth < 768;
         if (isMobile && selectedEmployee) {
             renderMobileEditor(selectedEmployee);
-            return; // Stop here, don't render the table
+            return;
         }
 
         employees.forEach(emp => {
@@ -370,7 +377,7 @@
                 
                 selectedEmployee = emp;
                 hasChanges = false;
-                initializeTable(); // Re-render the whole view based on new state
+                initializeTable();
             });
             
             const td=document.createElement("td");
@@ -390,7 +397,6 @@
                     cell.className+=" holiday-cell";
                 } else {
                     const val=currentData[emp]?.[fd]||"";
-                    // On desktop, the selected row is editable
                     if(isSelected && !isMobile){
                         createCellEditor(cell, val, defaultLocations, (nv)=>{
                             if(!currentData[emp])currentData[emp]={};
@@ -447,7 +453,7 @@
       setTimeout(() => {
         saveIndicator.style.opacity = 0;
         saveButton.textContent = "Save Changes";
-        if (window.innerWidth < 768) { // On mobile, go back to list after saving
+        if (window.innerWidth < 768) {
             selectedEmployee = null;
             initializeTable();
         }
