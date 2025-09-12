@@ -176,10 +176,27 @@
       </div>
       
       <div id="settings-view" class="theme-card p-6 lg:p-8 hidden">
-        <h2 class="text-2xl font-bold text-slate-800 mb-6">Settings - Holidays</h2>
-        <div id="holidays-container" class="space-y-4"></div>
-        <div class="mt-6 flex items-center gap-4">
-          <button id="add-holiday-button" class="btn btn-secondary px-4 py-2">Add Holiday</button>
+        <h2 class="text-2xl font-bold text-slate-800 mb-6">Settings</h2>
+        <div class="space-y-10">
+          <!-- Holidays Section -->
+          <section>
+            <h3 class="text-xl font-semibold mb-4">Holidays</h3>
+            <div id="holidays-container" class="space-y-4"></div>
+            <div class="mt-4 flex items-center gap-4">
+              <button id="add-holiday-button" class="btn btn-secondary px-4 py-2">Add Holiday</button>
+            </div>
+          </section>
+
+          <!-- Employee Defaults Section -->
+          <section>
+            <div class="flex items-center gap-2 mb-2">
+              <h3 class="text-xl font-semibold">Employee Defaults</h3>
+              <span class="text-xs text-slate-500">(ตั้งค่า Default ว่าวันจันทร์-ศุกร์ ไปที่ไหนต่อคน ใช้เป็นค่าเริ่มต้นจนกว่าจะเปลี่ยนในหน้า Schedule)</span>
+            </div>
+            <div id="defaults-container" class="space-y-4"></div>
+          </section>
+        </div>
+        <div class="mt-8 flex items-center gap-4">
           <button id="settings-save-button" class="btn btn-primary px-4 py-2">Save Settings</button>
           <span id="settings-save-indicator" class="ml-3 text-green-600 font-semibold opacity-0 save-indicator"></span>
         </div>
@@ -220,15 +237,15 @@
     const employees = ["P'Nuth","P'Note","P'Poom","P'O","Tew","PView","P'Bas","Big","Aim","Gib","Nut"];
     const daysOfWeek = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
     const defaultLocations = ["Enco","BPO","Amata","Rst","Training","Office","WFH","Leave"];
-    let selectedEmployee=null, hasChanges=false, currentData={}, holidays=[], currentWeekDates=[], currentWeekStart=null;
+    let selectedEmployee=null, hasChanges=false, currentData={}, holidays=[], defaults={}, currentWeekDates=[], currentWeekStart=null;
     
     const today = new Date();
     let initialDate = new Date();
-    const dayOfWeek = today.getDay(); 
+    const dayOfWeekNum = today.getDay(); 
 
-    if (dayOfWeek === 6) { 
+    if (dayOfWeekNum === 6) { 
       initialDate.setDate(today.getDate() + 2);
-    } else if (dayOfWeek === 0) { 
+    } else if (dayOfWeekNum === 0) { 
       initialDate.setDate(today.getDate() + 1);
     }
 
@@ -243,13 +260,25 @@
     const dateControls=document.getElementById("date-controls");
     const viewTitle=document.getElementById("view-title");
 
-    function formatDate(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+    function formatDate(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}    
     function formatDateForStorage(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
     function isSameDay(d1,d2){return d1.getFullYear()===d2.getFullYear()&&d1.getMonth()===d2.getMonth()&&d1.getDate()===d2.getDate();}
     function getMonday(d){const date=new Date(d);const day=date.getDay();const diff=date.getDate()-day+(day===0?-6:1);return new Date(date.setDate(diff));}
     function getWeekDisplayText(ws){const we=new Date(ws);we.setDate(we.getDate()+4);return `${ws.toLocaleDateString('en-US',{month:'long'})} ${ws.getDate()}-${we.getDate()}, ${ws.getFullYear()}`;}
     function isHoliday(d){return holidays.some(h=>h.date===formatDateForStorage(d));}
     function getHolidayName(d){const f=formatDateForStorage(d);const h=holidays.find(x=>x.date===f);return h?h.name:'';}
+    function weekdayKey(d){
+      const idx = d.getDay(); // 0=Sun ... 6=Sat
+      return daysOfWeek[[1,2,3,4,5].indexOf(idx)] || null; // map Mon..Fri
+    }
+    function getValueFor(emp, d){
+      const fd = formatDateForStorage(d);
+      const stored = currentData[emp]?.[fd];
+      if (stored && stored.trim() !== '') return stored;
+      const key = weekdayKey(d);
+      if (!key) return '';
+      return defaults?.[emp]?.[key] || '';
+    }
 
     function createCellEditor(container, initialValue, options, onChange) {
       container.innerHTML = '';
@@ -258,7 +287,7 @@
       
       const input = document.createElement('input');
       input.type = 'text'; 
-      input.className = 'form-input text-base'; // Ensure font size is good for mobile
+      input.className = 'form-input text-base';
       input.value = initialValue || ''; 
       input.placeholder = '-- พิมพ์หรือเลือก --';
 
@@ -297,14 +326,14 @@
       editorWrapper.appendChild(panel);
       container.appendChild(editorWrapper);
       if (window.innerWidth < 768) {
-          // Don't auto-focus on mobile as it can be jarring
+          // Don't auto-focus on mobile
       } else {
          input.focus();
       }
     }
     
     function renderMobileEditor(emp) {
-        mobileEditor.innerHTML = ''; // Clear previous
+        mobileEditor.innerHTML = '';
         mobileEditor.classList.remove('hidden');
         tableContainer.classList.add('hidden');
         dateControls.classList.add('hidden');
@@ -338,7 +367,7 @@
                 card.appendChild(holidayText);
             } else {
                 const editorContainer = document.createElement('div');
-                const val = currentData[emp]?.[fd] || "";
+                const val = getValueFor(emp, d) || "";
                 createCellEditor(editorContainer, val, defaultLocations, (nv) => {
                     if (!currentData[emp]) currentData[emp] = {};
                     currentData[emp][fd] = nv;
@@ -360,7 +389,6 @@
         dateControls.classList.remove('hidden');
         viewTitle.textContent = 'Weekly Schedule';
 
-
         const isMobile = window.innerWidth < 768;
         if (isMobile && selectedEmployee) {
             renderMobileEditor(selectedEmployee);
@@ -374,7 +402,6 @@
         
             tr.addEventListener("click", (e) => {
                 if (e.target.closest('.cell-editor-wrapper')) return;
-                
                 selectedEmployee = emp;
                 hasChanges = false;
                 initializeTable();
@@ -396,16 +423,16 @@
                     cell.textContent="Holiday: "+getHolidayName(d);
                     cell.className+=" holiday-cell";
                 } else {
-                    const val=currentData[emp]?.[fd]||"";
+                    const displayVal = getValueFor(emp, d) || "";
                     if(isSelected && !isMobile){
-                        createCellEditor(cell, val, defaultLocations, (nv)=>{
+                        createCellEditor(cell, displayVal, defaultLocations, (nv)=>{
                             if(!currentData[emp])currentData[emp]={};
-                            currentData[emp][fd]=nv;
+                            currentData[emp][fd]=nv; // override default for this date
                             hasChanges=true;
                             saveButton.disabled=false;
                         });
                     } else {
-                        cell.textContent=val;
+                        cell.textContent= displayVal;
                     }
                 }
                 if(isSameDay(d,today)) cell.classList.add("today-cell");
@@ -419,7 +446,7 @@
       currentWeekStart=ws;currentWeekDates=[];
       weekDisplay.textContent=getWeekDisplayText(ws);
       datePicker.value=formatDateForStorage(ws);
-      for(let i=0;i<5;i++){const d=new Date(ws);d.setDate(d.getDate()+i);currentWeekDates.push(d);}
+      for(let i=0;i<5;i++){const d=new Date(ws);d.setDate(d.getDate()+i);currentWeekDates.push(d);}    
       ["monday","tuesday","wednesday","thursday","friday"].forEach((id,i)=>{
         const h=document.getElementById(id+"-header");
         const span=h.querySelector(".date-header");
@@ -437,11 +464,14 @@
       sSnap.forEach(d=>{currentData[d.id]=d.data();});
       const hSnap=await getDoc(doc(db,"settings","holidays"));
       if(hSnap.exists()) { holidays=hSnap.data().holidays||[]; }
+      const dSnap=await getDoc(doc(db,"settings","defaults"));
+      if(dSnap.exists()) { defaults=dSnap.data().defaults||{}; } else { defaults={}; }
       
       setCurrentWeek(getMonday(initialDate));
       
       loadingOverlay.style.display="none";
       renderHolidays();
+      renderDefaults();
     }
 
     saveButton.addEventListener("click",async()=>{
@@ -468,6 +498,7 @@
 
     const holidaysContainer=document.getElementById("holidays-container");
     const settingsSaveIndicator = document.getElementById("settings-save-indicator");
+    const defaultsContainer = document.getElementById("defaults-container");
 
     function renderHolidays(){
       holidaysContainer.innerHTML="";
@@ -486,7 +517,7 @@
         inpName.oninput=()=>{holidays[i].name=inpName.value;};
 
         const btn=document.createElement("button");
-        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>`;
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule=\"evenodd\" d=\"M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z\" clip-rule=\"evenodd\" /></svg>`;
         btn.className="p-2 text-red-500 hover:bg-red-100 rounded-full transition-colors self-end sm:self-center flex-shrink-0";
         btn.onclick=()=>{holidays.splice(i,1);renderHolidays();};
         
@@ -494,11 +525,54 @@
         holidaysContainer.appendChild(div);
       });
     }
+
+    function renderDefaults(){
+      defaultsContainer.innerHTML = '';
+
+      // Helper to make a day row editor
+      const makeDayRow = (emp, day) => {
+        const row = document.createElement('div');
+        row.className = 'grid grid-cols-2 sm:grid-cols-6 gap-3 items-center';
+
+        const label = document.createElement('div');
+        label.className = 'text-sm text-slate-600 sm:col-span-1';
+        label.textContent = day;
+
+        const editorWrap = document.createElement('div');
+        editorWrap.className = 'sm:col-span-5';
+        const initVal = defaults?.[emp]?.[day] || '';
+        createCellEditor(editorWrap, initVal, defaultLocations, (nv)=>{
+          if (!defaults[emp]) defaults[emp] = {};
+          defaults[emp][day] = nv;
+        });
+
+        row.append(label, editorWrap);
+        return row;
+      };
+
+      employees.forEach(emp => {
+        const card = document.createElement('div');
+        card.className = 'border border-slate-200 rounded-xl p-4';
+
+        const head = document.createElement('div');
+        head.className = 'flex items-center justify-between';
+        head.innerHTML = `<div class="font-semibold">${emp}</div>`;
+
+        const body = document.createElement('div');
+        body.className = 'mt-3 space-y-2';
+        daysOfWeek.forEach(day => body.appendChild(makeDayRow(emp, day)));
+
+        card.append(head, body);
+        defaultsContainer.appendChild(card);
+      });
+    }
+
     document.getElementById("add-holiday-button").onclick=()=>{holidays.push({date:formatDateForStorage(new Date()),name:""});renderHolidays();};
     document.getElementById("settings-save-button").onclick=async()=>{
       const btn = document.getElementById("settings-save-button");
       btn.disabled = true;
       await setDoc(doc(db,"settings","holidays"),{holidays});
+      await setDoc(doc(db,"settings","defaults"),{defaults});
       settingsSaveIndicator.textContent = "อัปเดตเรียบร้อย!";
       settingsSaveIndicator.style.opacity=1;
       setTimeout(()=>{
@@ -574,7 +648,6 @@
             tr.appendChild(tdEmp);
 
             currentWeekDates.forEach(d => {
-                const fd = formatDateForStorage(d);
                 const cell = document.createElement('td');
                 cell.className = "p-4 whitespace-nowrap text-sm text-slate-600";
                 
@@ -582,7 +655,7 @@
                     cell.textContent = 'Holiday'; 
                     cell.className += " font-semibold text-pink-700";
                 } else {
-                    cell.textContent = currentData[emp]?.[fd] || '-';
+                    cell.textContent = getValueFor(emp, d) || '-';
                 }
                 if (isSameDay(d, today)) {
                     cell.className += " font-bold text-[#b8984a]";
