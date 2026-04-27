@@ -4,216 +4,445 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SL Daily Work Report</title>
-  
   <link rel="manifest" href="manifest.json">
-  
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  
-  <meta name="theme-color" content="#1a1a1a">
+  <meta name="theme-color" content="#f5dfa0">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
   <style>
-    /* Paris 2024 Olympics Theme ✨ */
+    *, *::before, *::after { box-sizing: border-box; }
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #f8f9fa;
-      color: #1a1a1a;
+      font-family: 'Inter', sans-serif;
+      background: #f3f4f6;
+      color: #0f172a;
+      min-height: 100vh;
     }
-    .theme-card {
-      background: #ffffff;
-      border: 1px solid #e0e0e0;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    .app-header {
+      background: linear-gradient(135deg, #f5dfa0 0%, #faecc8 45%, #fdf6e3 85%, #fffaf0 100%);
+      border-bottom: 1px solid #e8cc80;
     }
-    .app-header { background: #1a1a1a; }
     .app-title {
-      font-weight: 700; font-size: 1.75rem; color: #C9A959;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      font-weight: 800;
+      font-size: 1.4rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #7a4f10 0%, #b8730a 50%, #8a5c14 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    .nav-button {
-      border-radius: 9999px; transition: all 0.3s ease;
-      display: flex; align-items: center; gap: 0.5rem; color: #ffffff;
+    .nav-tab {
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      display: flex; align-items: center; gap: 6px;
+      color: #8a6520;
+      font-weight: 500;
+      font-size: 0.875rem;
+      padding: 7px 14px;
+      border: 1px solid transparent;
     }
-    .nav-button.active { background-color: #C9A959; color: #1a1a1a; font-weight: 600; }
-    .nav-button:hover:not(.active) { background-color: rgba(201, 169, 89, 0.2); }
+    .nav-tab.active {
+      background: rgba(184,115,10,0.15);
+      color: #7a4f10;
+      border-color: rgba(184,115,10,0.35);
+    }
+    .nav-tab:hover:not(.active) {
+      background: rgba(184,115,10,0.09);
+      color: #5a3a08;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 10px 30px rgba(0,0,0,0.05);
+    }
     .btn {
-      border-radius: 8px; font-weight: 600; transition: all 0.2s ease-out;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid transparent;
+      border-radius: 9px;
+      font-weight: 600;
+      font-size: 0.8125rem;
+      transition: all 0.18s ease;
+      border: 1px solid transparent;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+      cursor: pointer;
+      white-space: nowrap;
     }
-    .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
-    .btn-primary { background: #C9A959; color: #1a1a1a; }
-    .btn-primary:hover:not(:disabled) { background: #b8984a; }
-    .btn-export { background: #A7C7E7; color: #1a1a1a; }
-    .btn-export:hover { background: #9ab8d6; }
-    .btn-success { background: #D8BFD8; color: #1a1a1a; }
-    .btn-success:hover { background: #c7aec7; }
-    .btn-secondary { background-color: #ffffff; color: #1a1a1a; border: 1px solid #e0e0e0; }
-    .btn-secondary:hover { background-color: #f8f9fa; border-color: #d0d0d0; }
-    .table-container {
-      border-radius: 16px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -1px rgba(0,0,0,0.03);
-      overflow-x: auto;
+    .btn:hover:not(:disabled) { transform: translateY(-1px); }
+    .btn:active:not(:disabled) { transform: translateY(0); }
+    .btn:disabled { cursor: not-allowed; opacity: 0.45; }
+    .btn-primary {
+      background: linear-gradient(135deg, #c9a030 0%, #e8c254 100%);
+      color: #1a0f00;
+      box-shadow: 0 2px 8px rgba(201,160,48,0.35);
     }
-    thead { border-bottom: 2px solid #C9A959; }
-    tbody tr { transition: background-color 0.2s ease; cursor: pointer; }
-    tbody tr:hover { background-color: #f8f9fa; }
-    .selected-row {
-      background-color: #E6E6FA !important; color: #1a1a1a; font-weight: 600;
+    .btn-primary:hover:not(:disabled) { box-shadow: 0 4px 16px rgba(201,160,48,0.45); }
+    .btn-secondary {
+      background: #ffffff; color: #374151;
+      border-color: #d1d5db;
     }
-    .holiday-cell { background-color: #FADADD; color: #C0392B; font-weight: 500; }
-    .today-cell { background-color: #FCF8E3; }
-    .today-header { background: #C9A959 !important; color: #1a1a1a !important; }
-    .today-header .date-header { color: #1a1a1a !important; font-weight: 600; }
+    .btn-secondary:hover { background: #f9fafb; border-color: #9ca3af; }
+    .btn-export {
+      background: #eff6ff; color: #1d4ed8;
+      border-color: #bfdbfe;
+    }
+    .btn-export:hover { background: #dbeafe; }
+    .btn-success {
+      background: #f0fdf4; color: #166534;
+      border-color: #bbf7d0;
+    }
+    .btn-success:hover { background: #dcfce7; }
+    .btn-danger-ghost {
+      background: transparent; color: #ef4444;
+      border-color: transparent;
+    }
+    .btn-danger-ghost:hover { background: #fef2f2; border-color: #fecaca; }
     .form-input {
-      border: 1px solid #d1d5db; border-radius: 8px; padding: 0.75rem 0.75rem;
-      transition: all 0.2s ease; width: 100%; background-color: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 9px;
+      padding: 9px 12px;
+      transition: all 0.18s ease;
+      width: 100%;
+      background: #f9fafb;
+      color: #0f172a;
+      font-size: 0.875rem;
+      font-family: inherit;
     }
     .form-input:focus {
-      outline: none; border-color: #C9A959;
-      box-shadow: 0 0 0 3px rgba(201, 169, 89, 0.2);
+      outline: none;
+      border-color: #c9a030;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(201,160,48,0.12);
     }
     .combobox-panel {
-        display: none; position: absolute; z-index: 50; max-height: 160px; overflow-y: auto;
-        background: white; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-        border: 1px solid #e5e7eb; margin-top: 4px; width: 100%;
+      display: none; position: absolute; z-index: 50;
+      max-height: 180px; overflow-y: auto;
+      background: white; border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.06), 0 20px 40px rgba(0,0,0,0.1);
+      border: 1px solid #e5e7eb; margin-top: 4px; width: 100%;
     }
-    .combobox-option { padding: 10px 12px; cursor: pointer; font-size: 1rem; }
-    .combobox-option:hover { background: #f8f9fa; }
-    .combobox-option.highlighted { background: #E6E6FA; color: #1a1a1a; }
-    #export-source { position: absolute; left: -9999px; top: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    
-    /* Mobile Editor Styles */
+    .combobox-option {
+      padding: 9px 13px; cursor: pointer; font-size: 0.875rem;
+      display: flex; align-items: center; gap: 8px; color: #374151;
+    }
+    .combobox-option:hover { background: #f9fafb; }
+    .combobox-option.highlighted { background: #fffbeb; color: #92400e; font-weight: 600; }
+    .loc-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      display: inline-block; flex-shrink: 0;
+    }
+    .loc-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 600;
+      white-space: nowrap; border: 1px solid transparent;
+    }
+    .table-wrap {
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+    }
+    table { border-collapse: collapse; width: 100%; }
+    thead th {
+      background: #f9fafb;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #6b7280;
+      padding: 13px 18px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    thead th.today-header {
+      background: linear-gradient(135deg, #c9a030 0%, #e8c254 100%) !important;
+      color: #1a0f00 !important;
+    }
+    thead th.today-header .date-header { color: rgba(26,15,0,0.65) !important; }
+    tbody tr {
+      transition: background 0.12s ease;
+      cursor: pointer;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #fafafa; }
+    .selected-row { background: #fffbeb !important; }
+    .selected-row td.emp-cell { border-left: 3px solid #c9a030; }
+    tbody td {
+      padding: 11px 18px;
+      font-size: 0.875rem;
+      vertical-align: middle;
+    }
+    .emp-cell { background: inherit; }
+    .emp-avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: linear-gradient(135deg, #c9a030 0%, #e8c868 100%);
+      color: #1a0f00;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 800;
+      flex-shrink: 0; letter-spacing: 0.02em;
+    }
+    .avatar-input {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, #c9a030 0%, #e8c868 100%);
+      color: #1a0f00;
+      font-size: 0.65rem; font-weight: 800;
+      text-align: center; letter-spacing: 0.02em;
+      border: 2px solid transparent;
+      outline: none; flex-shrink: 0;
+      padding: 0; cursor: text;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .avatar-input:focus {
+      border-color: #1a0f00;
+      box-shadow: 0 0 0 3px rgba(201,160,48,0.35);
+    }
+    .today-col { background: #fffef5 !important; }
+    .holiday-cell { background: #fff5f5 !important; }
+    .week-nav {
+      display: flex; align-items: center;
+      background: #f3f4f6; border-radius: 10px; padding: 3px; gap: 2px;
+    }
+    .week-nav-btn {
+      width: 30px; height: 30px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s ease; color: #6b7280; cursor: pointer;
+      border: none; background: transparent;
+    }
+    .week-nav-btn:hover { background: #ffffff; color: #111827; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .week-nav-label {
+      font-weight: 600; color: #374151; padding: 0 12px;
+      font-size: 0.875rem; white-space: nowrap;
+    }
+    .section-tag {
+      width: 34px; height: 34px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .settings-section {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .settings-section-head {
+      padding: 14px 18px;
+      background: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .defaults-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .defaults-card-head {
+      padding: 10px 14px;
+      background: #f9fafb;
+      border-bottom: 1px solid #f3f4f6;
+      display: flex; align-items: center; gap: 8px;
+    }
+    #loading-overlay {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
     #mobile-editor .day-card {
-        background-color: #ffffff;
-        padding: 1rem;
-        border-radius: 12px;
-        border: 1px solid #e5e7eb;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      background: #ffffff;
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
     }
     #mobile-editor .day-label {
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        display: block;
-        color: #334155;
+      font-weight: 600; margin-bottom: 0.5rem;
+      display: block; color: #374151; font-size: 0.875rem;
     }
+    .save-flash {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #f0fdf4; color: #166534;
+      padding: 5px 11px; border-radius: 20px;
+      font-size: 0.775rem; font-weight: 600;
+      border: 1px solid #bbf7d0;
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    #export-source { position: absolute; left: -9999px; top: 0; font-family: 'Inter', sans-serif; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
   </style>
 </head>
-<body class="text-slate-800">
-  <div id="loading-overlay" class="fixed inset-0 bg-white/50 flex flex-col items-center justify-center z-50">
-    <div class="w-16 h-16 border-4 border-slate-200 border-t-[#C9A959] rounded-full animate-spin"></div>
-    <p class="mt-4 text-slate-800 font-semibold text-lg">เตรียมข้อมูลดีๆ สำหรับวันทำงานของคุณ...</p>
+<body>
+  <div id="loading-overlay" class="fixed inset-0 flex flex-col items-center justify-center z-50">
+    <div class="relative">
+      <div class="w-14 h-14 rounded-full border-[3px] border-white/10 border-t-[#C9A959] animate-spin"></div>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div class="w-5 h-5 rounded-full bg-gradient-to-br from-[#C9A959] to-[#e8c254] opacity-80"></div>
+      </div>
+    </div>
+    <p class="mt-5 text-white/70 font-medium text-sm tracking-wide">กำลังโหลดข้อมูล...</p>
   </div>
 
   <div class="min-h-screen flex flex-col">
-    <header class="app-header shadow-lg sticky top-0 z-30">
-        <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <h1 class="app-title">SL Daily Work Report ✨</h1>
+    <header class="app-header shadow-sm sticky top-0 z-30">
+      <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#c9a030] to-[#7a4f10] flex items-center justify-center shadow-lg shadow-amber-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
+          </div>
+          <h1 class="app-title">SL Daily Work Report</h1>
         </div>
-        <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pb-3">
-            <nav class="flex space-x-2">
-                <button id="nav-schedule" class="px-4 py-2 text-sm nav-button active">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" /></svg>
-                    <span>Schedule</span>
-                </button>
-                <button id="nav-settings" class="px-4 py-2 text-sm nav-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.532 1.532 0 012.287-.947c1.372.836 2.942-.734-2.106-2.106a1.532 1.532 0 01.947-2.287c1.561-.379-1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
-                    <span>Settings</span>
-                </button>
-            </nav>
-        </div>
+      </div>
+      <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pb-2.5">
+        <nav class="flex space-x-1.5">
+          <button id="nav-schedule" class="nav-tab active">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
+            Schedule
+          </button>
+          <button id="nav-settings" class="nav-tab">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.532 1.532 0 012.287-.947c1.372.836 2.942-.734-2.106-2.106a1.532 1.532 0 01.947-2.287c1.561-.379-1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+            Settings
+          </button>
+        </nav>
+      </div>
     </header>
 
-    <main class="flex-grow max-w-screen-xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div id="schedule-view" class="theme-card p-4 md:p-6 lg:p-8">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-          <h2 id="view-title" class="text-2xl font-bold text-slate-800">Weekly Schedule</h2>
-          <div class="flex items-center space-x-3 self-end sm:self-center">
-            <span id="save-indicator" class="text-sm text-green-600 font-semibold opacity-0 save-indicator"></span>
-            <button id="export-button" class="px-4 py-2 text-sm btn btn-export flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
-              <span>Export</span>
+    <main class="flex-grow max-w-screen-xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <!-- Schedule View -->
+      <div id="schedule-view" class="card p-5 md:p-7">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-3">
+          <h2 id="view-title" class="text-xl font-bold text-gray-900 tracking-tight">Weekly Schedule</h2>
+          <div class="flex items-center gap-2 self-end sm:self-center flex-wrap">
+            <span id="save-indicator" class="save-flash">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              อัปเดตเรียบร้อย!
+            </span>
+            <button id="export-button" class="btn btn-export px-3.5 py-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              Export
             </button>
-            <button id="save-button" class="px-4 py-2 text-sm btn btn-primary" disabled>Save Changes</button>
+            <button id="save-button" class="btn btn-primary px-3.5 py-2" disabled>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293z"/></svg>
+              Save Changes
+            </button>
           </div>
         </div>
 
-        <div id="date-controls" class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 flex-wrap">
-          <div class="flex items-center bg-amber-50 rounded-full p-1 border border-amber-200">
-            <button id="prev-week" class="p-2 rounded-full hover:bg-amber-100 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-800" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        <div id="date-controls" class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-3 flex-wrap">
+          <div class="week-nav">
+            <button id="prev-week" class="week-nav-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
             </button>
-            <span id="week-display" class="font-semibold text-amber-900 px-4 text-center text-sm sm:text-base"></span>
-            <button id="next-week" class="p-2 rounded-full hover:bg-amber-100 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-800" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            <span id="week-display" class="week-nav-label"></span>
+            <button id="next-week" class="week-nav-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </button>
           </div>
-          <div class="flex items-center space-x-2">
-            <input type="date" id="date-picker" class="form-input w-auto"/>
-            <button id="today-button" class="btn btn-secondary px-4 py-2">Today</button>
+          <div class="flex items-center gap-2">
+            <input type="date" id="date-picker" class="form-input w-auto text-sm"/>
+            <button id="today-button" class="btn btn-secondary px-3.5 py-2">Today</button>
           </div>
         </div>
-        
-        <div id="table-container" class="table-container">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-white z-20">
+
+        <div id="table-container" class="table-wrap overflow-x-auto">
+          <table>
+            <thead>
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wider sticky left-0 bg-white z-20">Employee</th>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wider" id="monday-header">Monday <span class="block date-header font-medium normal-case text-slate-500"></span></th>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wider" id="tuesday-header">Tuesday <span class="block date-header font-medium normal-case text-slate-500"></span></th>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wider" id="wednesday-header">Wednesday <span class="block date-header font-medium normal-case text-slate-500"></span></th>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wider" id="thursday-header">Thursday <span class="block date-header font-medium normal-case text-slate-500"></span></th>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wider" id="friday-header">Friday <span class="block date-header font-medium normal-case text-slate-500"></span></th>
+                <th class="sticky left-0 bg-[#f9fafb] z-20 min-w-[140px]">Employee</th>
+                <th id="monday-header">Monday <span class="block date-header font-normal normal-case text-[0.7rem] mt-0.5 opacity-70"></span></th>
+                <th id="tuesday-header">Tuesday <span class="block date-header font-normal normal-case text-[0.7rem] mt-0.5 opacity-70"></span></th>
+                <th id="wednesday-header">Wednesday <span class="block date-header font-normal normal-case text-[0.7rem] mt-0.5 opacity-70"></span></th>
+                <th id="thursday-header">Thursday <span class="block date-header font-normal normal-case text-[0.7rem] mt-0.5 opacity-70"></span></th>
+                <th id="friday-header">Friday <span class="block date-header font-normal normal-case text-[0.7rem] mt-0.5 opacity-70"></span></th>
               </tr>
             </thead>
-            <tbody id="schedule-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+            <tbody id="schedule-table-body" class="bg-white divide-y divide-gray-50"></tbody>
           </table>
         </div>
-        
-        <div id="mobile-editor" class="mt-4 space-y-4"></div>
 
+        <div id="mobile-editor" class="mt-4 space-y-3"></div>
       </div>
-      
-      <div id="settings-view" class="theme-card p-6 lg:p-8 hidden">
-        <h2 class="text-2xl font-bold text-slate-800 mb-6">Settings</h2>
-        <div class="space-y-10">
-          <!-- Holidays Section -->
-          <section>
-            <h3 class="text-xl font-semibold mb-4">Holidays</h3>
-            <div id="holidays-container" class="space-y-4"></div>
-            <div class="mt-4 flex items-center gap-4">
-              <button id="add-holiday-button" class="btn btn-secondary px-4 py-2">Add Holiday</button>
+
+      <!-- Settings View -->
+      <div id="settings-view" class="card p-6 lg:p-8 hidden">
+        <h2 class="text-xl font-bold text-gray-900 tracking-tight mb-6">Settings</h2>
+        <div class="space-y-6">
+
+          <!-- Employees Section -->
+          <div class="settings-section">
+            <div class="settings-section-head">
+              <div class="section-tag bg-violet-50">👥</div>
+              <div>
+                <p class="font-semibold text-gray-800 text-sm">Employees</p>
+                <p class="text-xs text-gray-500 mt-0.5">แก้ไขชื่อหรือลบพนักงานที่ออกไปแล้ว</p>
+              </div>
             </div>
-          </section>
+            <div class="p-4 space-y-2.5" id="employees-container"></div>
+            <div class="px-4 pb-4">
+              <button id="add-employee-button" class="btn btn-secondary px-4 py-2 w-full sm:w-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+                Add Employee
+              </button>
+            </div>
+          </div>
+
+          <!-- Holidays Section -->
+          <div class="settings-section">
+            <div class="settings-section-head">
+              <div class="section-tag bg-rose-50">🎌</div>
+              <div>
+                <p class="font-semibold text-gray-800 text-sm">Holidays</p>
+                <p class="text-xs text-gray-500 mt-0.5">กำหนดวันหยุดนักขัตฤกษ์ประจำปี</p>
+              </div>
+            </div>
+            <div class="p-4 space-y-3" id="holidays-container"></div>
+            <div class="px-4 pb-4">
+              <button id="add-holiday-button" class="btn btn-secondary px-4 py-2 w-full sm:w-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+                Add Holiday
+              </button>
+            </div>
+          </div>
 
           <!-- Employee Defaults Section -->
-          <section>
-            <div class="flex items-center gap-2 mb-2">
-              <h3 class="text-xl font-semibold">Employee Defaults</h3>
-              <span class="text-xs text-slate-500">(ตั้งค่า Default ว่าวันจันทร์-ศุกร์ ไปที่ไหนต่อคน ใช้เป็นค่าเริ่มต้นจนกว่าจะเปลี่ยนในหน้า Schedule)</span>
+          <div class="settings-section">
+            <div class="settings-section-head">
+              <div class="section-tag bg-amber-50">⚙️</div>
+              <div>
+                <p class="font-semibold text-gray-800 text-sm">Employee Defaults</p>
+                <p class="text-xs text-gray-500 mt-0.5">ตั้งค่า Default วันจันทร์–ศุกร์ต่อคน (ใช้จนกว่าจะแก้ใน Schedule)</p>
+              </div>
             </div>
-            <div id="defaults-container" class="space-y-4"></div>
-          </section>
+            <div class="p-4 space-y-4" id="defaults-container"></div>
+          </div>
+
         </div>
-        <div class="mt-8 flex items-center gap-4">
-          <button id="settings-save-button" class="btn btn-primary px-4 py-2">Save Settings</button>
-          <span id="settings-save-indicator" class="ml-3 text-green-600 font-semibold opacity-0 save-indicator"></span>
+        <div class="mt-6 flex items-center gap-3 pt-5 border-t border-gray-100">
+          <button id="settings-save-button" class="btn btn-primary px-5 py-2.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293z"/></svg>
+            Save Settings
+          </button>
+          <span id="settings-save-indicator" class="save-flash">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            อัปเดตเรียบร้อย!
+          </span>
         </div>
       </div>
     </main>
   </div>
-  
+
   <div id="export-source"></div>
 
-  <div id="export-preview" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 hidden">
-    <div class="export-container bg-white/80 backdrop-blur-md w-full max-w-5xl h-full max-h-[90vh] flex flex-col p-4 gap-4 rounded-2xl border border-white/20">
-      <div id="export-content" class="flex-grow rounded-xl overflow-y-auto bg-white p-2 shadow-inner">
-      </div>
-        <button class="export-close absolute -top-2 -right-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center cursor-pointer font-bold hover:bg-red-600 transition-transform hover:scale-110 z-10" id="export-close">✕</button>
-      <div class="flex-shrink-0 flex justify-center gap-4">
-        <button id="download-image" class="btn btn-primary px-5 py-2">Download</button>
-        <button id="copy-image" class="btn btn-success px-5 py-2">Copy</button>
+  <div id="export-preview" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+    <div class="relative bg-white/90 backdrop-blur-md w-full max-w-5xl h-full max-h-[88vh] flex flex-col p-4 gap-4 rounded-2xl border border-white/30 shadow-2xl">
+      <div id="export-content" class="flex-grow rounded-xl overflow-y-auto bg-white p-2 shadow-inner"></div>
+      <button id="export-close" class="absolute -top-3 -right-3 bg-gray-900 text-white w-8 h-8 rounded-full flex items-center justify-center cursor-pointer font-bold hover:bg-red-600 transition-colors text-sm shadow-lg">✕</button>
+      <div class="flex-shrink-0 flex justify-center gap-3">
+        <button id="download-image" class="btn btn-primary px-5 py-2.5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+          Download
+        </button>
+        <button id="copy-image" class="btn btn-success px-5 py-2.5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/></svg>
+          Copy
+        </button>
       </div>
     </div>
   </div>
@@ -234,20 +463,44 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const employees = ["P'Nuth","P'Note","P'Poom","P'O","Tew","PView","P'Bas","Big","Aim","Gib","Nut"];
+    const DEFAULT_EMPLOYEES = ["P'Nuth","P'Note","P'Poom","P'O","Tew","PView","P'Bas","Big","Aim","Gib","Nut"];
+    let employees = [...DEFAULT_EMPLOYEES];
+    let avatarMap = {};
     const daysOfWeek = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
     const defaultLocations = ["Enco","BPO","Amata","Rst","Training","Office","WFH","Leave"];
+
+    const LOC_STYLE = {
+      Enco:     { bg:'#eff6ff', text:'#1d4ed8', border:'#bfdbfe', dot:'#3b82f6' },
+      BPO:      { bg:'#f5f3ff', text:'#6d28d9', border:'#ddd6fe', dot:'#8b5cf6' },
+      Amata:    { bg:'#fff7ed', text:'#c2410c', border:'#fed7aa', dot:'#f97316' },
+      Rst:      { bg:'#f0fdfa', text:'#0f766e', border:'#99f6e4', dot:'#14b8a6' },
+      Training: { bg:'#fefce8', text:'#a16207', border:'#fde68a', dot:'#eab308' },
+      Office:   { bg:'#f8fafc', text:'#475569', border:'#e2e8f0', dot:'#94a3b8' },
+      WFH:      { bg:'#f0fdf4', text:'#15803d', border:'#bbf7d0', dot:'#22c55e' },
+      Leave:    { bg:'#fff1f2', text:'#be123c', border:'#fecdd3', dot:'#f43f5e' },
+    };
+
+    function getInitials(name) {
+      const clean = name.replace(/^P['\u2019]/, '').trim();
+      return clean.slice(0, 2).toUpperCase() || name.slice(0, 2).toUpperCase();
+    }
+    function getAvatarText(name) {
+      return avatarMap[name] || getInitials(name);
+    }
+
+    function renderLocBadge(val) {
+      const s = LOC_STYLE[val];
+      if (!s) return `<span class="text-gray-500 text-xs">${val || '—'}</span>`;
+      return `<span class="loc-badge" style="background:${s.bg};color:${s.text};border-color:${s.border}"><span class="loc-dot" style="background:${s.dot}"></span>${val}</span>`;
+    }
+
     let selectedEmployee=null, hasChanges=false, currentData={}, holidays=[], defaults={}, currentWeekDates=[], currentWeekStart=null;
-    
+
     const today = new Date();
     let initialDate = new Date();
-    const dayOfWeekNum = today.getDay(); 
-
-    if (dayOfWeekNum === 6) { 
-      initialDate.setDate(today.getDate() + 2);
-    } else if (dayOfWeekNum === 0) { 
-      initialDate.setDate(today.getDate() + 1);
-    }
+    const dayOfWeekNum = today.getDay();
+    if (dayOfWeekNum === 6) { initialDate.setDate(today.getDate() + 2); }
+    else if (dayOfWeekNum === 0) { initialDate.setDate(today.getDate() + 1); }
 
     const loadingOverlay=document.getElementById("loading-overlay");
     const tableBody=document.getElementById("schedule-table-body");
@@ -260,306 +513,330 @@
     const dateControls=document.getElementById("date-controls");
     const viewTitle=document.getElementById("view-title");
 
-    function formatDate(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}    
+    function formatDate(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
     function formatDateForStorage(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
     function isSameDay(d1,d2){return d1.getFullYear()===d2.getFullYear()&&d1.getMonth()===d2.getMonth()&&d1.getDate()===d2.getDate();}
     function getMonday(d){const date=new Date(d);const day=date.getDay();const diff=date.getDate()-day+(day===0?-6:1);return new Date(date.setDate(diff));}
-    function getWeekDisplayText(ws){const we=new Date(ws);we.setDate(we.getDate()+4);return `${ws.toLocaleDateString('en-US',{month:'long'})} ${ws.getDate()}-${we.getDate()}, ${ws.getFullYear()}`;}
+    function getWeekDisplayText(ws){const we=new Date(ws);we.setDate(we.getDate()+4);return `${ws.toLocaleDateString('en-US',{month:'short'})} ${ws.getDate()} – ${we.getDate()}, ${ws.getFullYear()}`;}
     function isHoliday(d){return holidays.some(h=>h.date===formatDateForStorage(d));}
     function getHolidayName(d){const f=formatDateForStorage(d);const h=holidays.find(x=>x.date===f);return h?h.name:'';}
-    function weekdayKey(d){
-      const idx = d.getDay(); // 0=Sun ... 6=Sat
-      return daysOfWeek[[1,2,3,4,5].indexOf(idx)] || null; // map Mon..Fri
-    }
-    function getValueFor(emp, d){
-      const fd = formatDateForStorage(d);
-      const stored = currentData[emp]?.[fd];
-      if (stored && stored.trim() !== '') return stored;
-      const key = weekdayKey(d);
-      if (!key) return '';
-      return defaults?.[emp]?.[key] || '';
+    function weekdayKey(d){const idx=d.getDay();return daysOfWeek[[1,2,3,4,5].indexOf(idx)]||null;}
+    function getValueFor(emp,d){
+      const fd=formatDateForStorage(d);
+      const stored=currentData[emp]?.[fd];
+      if(stored&&stored.trim()!=='')return stored;
+      const key=weekdayKey(d);
+      if(!key)return '';
+      return defaults?.[emp]?.[key]||'';
     }
 
     function createCellEditor(container, initialValue, options, onChange) {
       container.innerHTML = '';
-      const editorWrapper = document.createElement('div');
-      editorWrapper.className = 'cell-editor-wrapper relative w-full';
-      
+      const wrap = document.createElement('div');
+      wrap.className = 'cell-editor-wrapper relative w-full';
+
       const input = document.createElement('input');
-      input.type = 'text'; 
-      input.className = 'form-input text-base';
-      input.value = initialValue || ''; 
-      input.placeholder = '-- พิมพ์หรือเลือก --';
+      input.type = 'text';
+      input.className = 'form-input text-sm';
+      input.value = initialValue || '';
+      input.placeholder = '— พิมพ์หรือเลือก —';
 
       const panel = document.createElement('div');
       panel.className = 'combobox-panel';
 
-      const updateOptions = (filter = '') => {
-          panel.innerHTML = '';
-          const filteredOptions = options.filter(opt => opt.toLowerCase().includes(filter.toLowerCase()));
-          if (filteredOptions.length === 0) {
-              panel.innerHTML = `<div class="combobox-option text-slate-500">No results</div>`;
-          } else {
-              filteredOptions.forEach(opt => {
-                  const optionEl = document.createElement('div');
-                  optionEl.className = 'combobox-option'; 
-                  optionEl.textContent = opt;
-                  if (opt === input.value) optionEl.classList.add('highlighted');
-                  optionEl.addEventListener('mousedown', (e) => {
-                      e.preventDefault(); 
-                      input.value = opt;
-                      onChange(opt); 
-                      panel.style.display = 'none';
-                  });
-                  panel.appendChild(optionEl);
-              });
-          }
+      const updateOptions = (filter='') => {
+        panel.innerHTML = '';
+        const filtered = options.filter(o => o.toLowerCase().includes(filter.toLowerCase()));
+        if (!filtered.length) {
+          panel.innerHTML = `<div class="combobox-option text-gray-400">No results</div>`;
+        } else {
+          filtered.forEach(opt => {
+            const s = LOC_STYLE[opt];
+            const el = document.createElement('div');
+            el.className = 'combobox-option';
+            if (opt === input.value) el.classList.add('highlighted');
+            el.innerHTML = s
+              ? `<span class="loc-dot" style="background:${s.dot}"></span>${opt}`
+              : opt;
+            el.addEventListener('mousedown', e => {
+              e.preventDefault();
+              input.value = opt;
+              onChange(opt);
+              panel.style.display = 'none';
+            });
+            panel.appendChild(el);
+          });
+        }
       };
-      input.addEventListener('input', () => { 
-        updateOptions(input.value); 
-        onChange(input.value);
-      });
+      input.addEventListener('input', () => { updateOptions(input.value); onChange(input.value); });
       input.addEventListener('focus', () => { updateOptions(input.value); panel.style.display = 'block'; });
-      input.addEventListener('blur', () => { setTimeout(() => { panel.style.display = 'none'; }, 200); });
+      input.addEventListener('blur', () => setTimeout(() => { panel.style.display = 'none'; }, 200));
 
-      editorWrapper.appendChild(input);
-      editorWrapper.appendChild(panel);
-      container.appendChild(editorWrapper);
-      if (window.innerWidth < 768) {
-          // Don't auto-focus on mobile
-      } else {
-         input.focus();
-      }
+      wrap.appendChild(input);
+      wrap.appendChild(panel);
+      container.appendChild(wrap);
+      if (window.innerWidth >= 768) input.focus();
     }
-    
-    function renderMobileEditor(emp) {
-        mobileEditor.innerHTML = '';
-        mobileEditor.classList.remove('hidden');
-        tableContainer.classList.add('hidden');
-        dateControls.classList.add('hidden');
-        viewTitle.textContent = `Edit: ${emp}`;
 
-        const backButton = document.createElement('button');
-        backButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> Back to list`;
-        backButton.className = "btn btn-secondary mb-4 flex items-center";
-        backButton.onclick = () => {
-            selectedEmployee = null;
-            initializeTable();
-        };
-        mobileEditor.appendChild(backButton);
+    function renderMobileEditor(emp) {
+      mobileEditor.innerHTML = '';
+      mobileEditor.classList.remove('hidden');
+      tableContainer.classList.add('hidden');
+      dateControls.classList.add('hidden');
+      viewTitle.textContent = `Edit: ${emp}`;
+
+      const backButton = document.createElement('button');
+      backButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Back`;
+      backButton.className = "btn btn-secondary mb-3 px-4 py-2";
+      backButton.onclick = () => { selectedEmployee = null; initializeTable(); };
+      mobileEditor.appendChild(backButton);
+
+      daysOfWeek.forEach((day, i) => {
+        const d = currentWeekDates[i];
+        const fd = formatDateForStorage(d);
+        const card = document.createElement('div');
+        card.className = 'day-card';
+        const label = document.createElement('label');
+        label.className = 'day-label';
+        label.textContent = `${day}  •  ${formatDate(d)}`;
+        card.appendChild(label);
+        if (isHoliday(d)) {
+          const ht = document.createElement('p');
+          ht.innerHTML = `<span class="loc-badge" style="background:#fee2e2;color:#dc2626;border-color:#fecaca"><span class="loc-dot" style="background:#f87171"></span>Holiday: ${getHolidayName(d)}</span>`;
+          card.appendChild(ht);
+        } else {
+          const ec = document.createElement('div');
+          const val = getValueFor(emp, d) || "";
+          createCellEditor(ec, val, defaultLocations, nv => {
+            if (!currentData[emp]) currentData[emp] = {};
+            currentData[emp][fd] = nv;
+            hasChanges = true;
+            saveButton.disabled = false;
+          });
+          card.appendChild(ec);
+        }
+        mobileEditor.appendChild(card);
+      });
+    }
+
+    function initializeTable() {
+      saveButton.disabled = true;
+      tableBody.innerHTML = "";
+      mobileEditor.innerHTML = "";
+      mobileEditor.classList.add('hidden');
+      tableContainer.classList.remove('hidden');
+      dateControls.classList.remove('hidden');
+      viewTitle.textContent = 'Weekly Schedule';
+
+      const isMobile = window.innerWidth < 768;
+      if (isMobile && selectedEmployee) { renderMobileEditor(selectedEmployee); return; }
+
+      employees.forEach(emp => {
+        const tr = document.createElement("tr");
+        const isSelected = emp === selectedEmployee;
+        if (isSelected) tr.classList.add("selected-row");
+
+        tr.addEventListener("click", e => {
+          if (e.target.closest('.cell-editor-wrapper')) return;
+          selectedEmployee = emp;
+          hasChanges = false;
+          initializeTable();
+        });
+
+        // Employee cell with avatar
+        const td = document.createElement("td");
+        td.className = "emp-cell sticky left-0 z-10 bg-white";
+        if (isSelected) td.style.background = '#fffbeb';
+        td.innerHTML = `<div class="flex items-center gap-2.5"><div class="emp-avatar">${getAvatarText(emp)}</div><span class="font-medium text-gray-800">${emp}</span></div>`;
+        tr.appendChild(td);
 
         daysOfWeek.forEach((day, i) => {
-            const d = currentWeekDates[i];
-            const fd = formatDateForStorage(d);
+          const d = currentWeekDates[i];
+          const fd = formatDateForStorage(d);
+          const cell = document.createElement("td");
+          cell.className = "text-sm";
+          if (isSameDay(d, today)) cell.classList.add("today-col");
 
-            const card = document.createElement('div');
-            card.className = 'day-card';
-
-            const label = document.createElement('label');
-            label.className = 'day-label';
-            label.textContent = `${day} (${formatDate(d)})`;
-            card.appendChild(label);
-
-            if (isHoliday(d)) {
-                const holidayText = document.createElement('p');
-                holidayText.textContent = `Holiday: ${getHolidayName(d)}`;
-                holidayText.className = 'text-red-600 font-semibold py-2';
-                card.appendChild(holidayText);
+          if (isHoliday(d)) {
+            cell.classList.add("holiday-cell");
+            cell.innerHTML = `<span class="loc-badge" style="background:#fee2e2;color:#dc2626;border-color:#fecaca"><span class="loc-dot" style="background:#f87171"></span>${getHolidayName(d)}</span>`;
+          } else {
+            const displayVal = getValueFor(emp, d) || "";
+            if (isSelected && !isMobile) {
+              createCellEditor(cell, displayVal, defaultLocations, nv => {
+                if (!currentData[emp]) currentData[emp] = {};
+                currentData[emp][fd] = nv;
+                hasChanges = true;
+                saveButton.disabled = false;
+              });
             } else {
-                const editorContainer = document.createElement('div');
-                const val = getValueFor(emp, d) || "";
-                createCellEditor(editorContainer, val, defaultLocations, (nv) => {
-                    if (!currentData[emp]) currentData[emp] = {};
-                    currentData[emp][fd] = nv;
-                    hasChanges = true;
-                    saveButton.disabled = false;
-                });
-                card.appendChild(editorContainer);
+              cell.innerHTML = renderLocBadge(displayVal);
             }
-            mobileEditor.appendChild(card);
+          }
+          tr.appendChild(cell);
         });
+        tableBody.appendChild(tr);
+      });
     }
 
-    function initializeTable(){
-        saveButton.disabled = true;
-        tableBody.innerHTML="";
-        mobileEditor.innerHTML="";
-        mobileEditor.classList.add('hidden');
-        tableContainer.classList.remove('hidden');
-        dateControls.classList.remove('hidden');
-        viewTitle.textContent = 'Weekly Schedule';
-
-        const isMobile = window.innerWidth < 768;
-        if (isMobile && selectedEmployee) {
-            renderMobileEditor(selectedEmployee);
-            return;
-        }
-
-        employees.forEach(emp => {
-            const tr = document.createElement("tr");
-            const isSelected = emp === selectedEmployee;
-            if (isSelected) tr.classList.add("selected-row");
-        
-            tr.addEventListener("click", (e) => {
-                if (e.target.closest('.cell-editor-wrapper')) return;
-                selectedEmployee = emp;
-                hasChanges = false;
-                initializeTable();
-            });
-            
-            const td=document.createElement("td");
-            td.className="px-6 py-4 whitespace-nowrap text-sm font-medium sticky left-0 z-10";
-            td.textContent=emp;
-            td.style.backgroundColor = isSelected ? '#E6E6FA' : '#ffffff';
-            tr.appendChild(td);
-
-            daysOfWeek.forEach((day,i)=>{
-                const d=currentWeekDates[i];
-                const fd=formatDateForStorage(d);
-                const cell=document.createElement("td");
-                cell.className="px-2 sm:px-6 py-2 whitespace-nowrap text-sm";
-              
-                if(isHoliday(d)){
-                    cell.textContent="Holiday: "+getHolidayName(d);
-                    cell.className+=" holiday-cell";
-                } else {
-                    const displayVal = getValueFor(emp, d) || "";
-                    if(isSelected && !isMobile){
-                        createCellEditor(cell, displayVal, defaultLocations, (nv)=>{
-                            if(!currentData[emp])currentData[emp]={};
-                            currentData[emp][fd]=nv; // override default for this date
-                            hasChanges=true;
-                            saveButton.disabled=false;
-                        });
-                    } else {
-                        cell.textContent= displayVal;
-                    }
-                }
-                if(isSameDay(d,today)) cell.classList.add("today-cell");
-                tr.appendChild(cell);
-            });
-            tableBody.appendChild(tr);
-        });
-    }
-
-    function setCurrentWeek(ws){
-      currentWeekStart=ws;currentWeekDates=[];
-      weekDisplay.textContent=getWeekDisplayText(ws);
-      datePicker.value=formatDateForStorage(ws);
-      for(let i=0;i<5;i++){const d=new Date(ws);d.setDate(d.getDate()+i);currentWeekDates.push(d);}    
-      ["monday","tuesday","wednesday","thursday","friday"].forEach((id,i)=>{
-        const h=document.getElementById(id+"-header");
-        const span=h.querySelector(".date-header");
-        span.textContent=formatDate(currentWeekDates[i]);
+    function setCurrentWeek(ws) {
+      currentWeekStart = ws; currentWeekDates = [];
+      weekDisplay.textContent = getWeekDisplayText(ws);
+      datePicker.value = formatDateForStorage(ws);
+      for (let i = 0; i < 5; i++) { const d = new Date(ws); d.setDate(d.getDate()+i); currentWeekDates.push(d); }
+      ["monday","tuesday","wednesday","thursday","friday"].forEach((id,i) => {
+        const h = document.getElementById(id+"-header");
+        const span = h.querySelector(".date-header");
+        span.textContent = formatDate(currentWeekDates[i]);
         h.classList.remove("today-header");
-        if(isSameDay(currentWeekDates[i],today)) h.classList.add("today-header");
+        if (isSameDay(currentWeekDates[i], today)) h.classList.add("today-header");
       });
       initializeTable();
     }
 
-    async function fetchData(){
-      loadingOverlay.style.display="flex";
-      const sSnap=await getDocs(collection(db,"schedules"));
+    async function fetchData() {
+      loadingOverlay.style.display = "flex";
+      const sSnap = await getDocs(collection(db,"schedules"));
       currentData = {};
-      sSnap.forEach(d=>{currentData[d.id]=d.data();});
-      const hSnap=await getDoc(doc(db,"settings","holidays"));
-      if(hSnap.exists()) { holidays=hSnap.data().holidays||[]; }
-      const dSnap=await getDoc(doc(db,"settings","defaults"));
-      if(dSnap.exists()) { defaults=dSnap.data().defaults||{}; } else { defaults={}; }
-      
+      sSnap.forEach(d => { currentData[d.id] = d.data(); });
+      const hSnap = await getDoc(doc(db,"settings","holidays"));
+      if (hSnap.exists()) { holidays = hSnap.data().holidays || []; }
+      const dSnap = await getDoc(doc(db,"settings","defaults"));
+      if (dSnap.exists()) { defaults = dSnap.data().defaults || {}; } else { defaults = {}; }
+      const eSnap = await getDoc(doc(db,"settings","employees"));
+      if (eSnap.exists() && eSnap.data().list?.length) { employees = eSnap.data().list; }
+      if (eSnap.exists() && eSnap.data().avatarMap) { avatarMap = eSnap.data().avatarMap; }
+
       setCurrentWeek(getMonday(initialDate));
-      
-      loadingOverlay.style.display="none";
+      loadingOverlay.style.display = "none";
+      renderEmployees();
       renderHolidays();
       renderDefaults();
     }
 
-    saveButton.addEventListener("click",async()=>{
-      if(!selectedEmployee||!hasChanges)return;
-      saveButton.disabled=true;saveButton.textContent="Saving...";
-      await setDoc(doc(db,"schedules",selectedEmployee),currentData[selectedEmployee]||{},{merge:true});
-      saveIndicator.textContent = "อัปเดตเรียบร้อย!";
-      saveIndicator.style.opacity=1;
+    function flashIndicator(el) {
+      el.style.opacity = 1;
+      setTimeout(() => { el.style.opacity = 0; }, 2500);
+    }
+
+    saveButton.addEventListener("click", async () => {
+      if (!selectedEmployee || !hasChanges) return;
+      saveButton.disabled = true;
+      saveButton.innerHTML = `<svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Saving…`;
+      await setDoc(doc(db,"schedules",selectedEmployee), currentData[selectedEmployee]||{}, {merge:true});
+      flashIndicator(saveIndicator);
+      hasChanges = false;
       setTimeout(() => {
-        saveIndicator.style.opacity = 0;
         saveButton.textContent = "Save Changes";
-        if (window.innerWidth < 768) {
-            selectedEmployee = null;
-            initializeTable();
-        }
+        if (window.innerWidth < 768) { selectedEmployee = null; initializeTable(); }
       }, 2500);
-      hasChanges=false;
     });
 
-    document.getElementById("prev-week").addEventListener("click",()=>{const d=new Date(currentWeekStart);d.setDate(d.getDate()-7);setCurrentWeek(d);});
-    document.getElementById("next-week").addEventListener("click",()=>{const d=new Date(currentWeekStart);d.setDate(d.getDate()+7);setCurrentWeek(d);});
-    datePicker.addEventListener("change",()=>setCurrentWeek(getMonday(new Date(datePicker.value))));
-    document.getElementById("today-button").addEventListener("click",()=>setCurrentWeek(getMonday(new Date())));
+    document.getElementById("prev-week").addEventListener("click", () => { const d=new Date(currentWeekStart); d.setDate(d.getDate()-7); setCurrentWeek(d); });
+    document.getElementById("next-week").addEventListener("click", () => { const d=new Date(currentWeekStart); d.setDate(d.getDate()+7); setCurrentWeek(d); });
+    datePicker.addEventListener("change", () => setCurrentWeek(getMonday(new Date(datePicker.value))));
+    document.getElementById("today-button").addEventListener("click", () => setCurrentWeek(getMonday(new Date())));
 
-    const holidaysContainer=document.getElementById("holidays-container");
+    const holidaysContainer = document.getElementById("holidays-container");
     const settingsSaveIndicator = document.getElementById("settings-save-indicator");
     const defaultsContainer = document.getElementById("defaults-container");
+    const employeesContainer = document.getElementById("employees-container");
 
-    function renderHolidays(){
-      holidaysContainer.innerHTML="";
-      holidays.forEach((h,i)=>{
-        const div=document.createElement("div");
-        div.className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full";
-        
-        const inpDate=document.createElement("input");
-        inpDate.type="date";inpDate.value=h.date;
-        inpDate.className="form-input sm:w-48";
-        inpDate.onchange=()=>{holidays[i].date=inpDate.value;};
-        
-        const inpName=document.createElement("input");
-        inpName.type="text";inpName.value=h.name;inpName.placeholder="Holiday name";
-        inpName.className="form-input w-full sm:flex-1";
-        inpName.oninput=()=>{holidays[i].name=inpName.value;};
+    function renderEmployees() {
+      employeesContainer.innerHTML = '';
+      employees.forEach((emp, i) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2.5';
 
-        const btn=document.createElement("button");
-        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule=\"evenodd\" d=\"M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z\" clip-rule=\"evenodd\" /></svg>`;
-        btn.className="p-2 text-red-500 hover:bg-red-100 rounded-full transition-colors self-end sm:self-center flex-shrink-0";
-        btn.onclick=()=>{holidays.splice(i,1);renderHolidays();};
-        
-        div.append(inpDate,inpName,btn);
+        const avatar = document.createElement('input');
+        avatar.type = 'text';
+        avatar.className = 'avatar-input';
+        avatar.maxLength = 3;
+        avatar.value = getAvatarText(emp);
+        avatar.title = 'คลิกเพื่อแก้ไข avatar';
+        avatar.oninput = () => { avatarMap[employees[i]] = avatar.value || getInitials(employees[i]); };
+
+        const inp = document.createElement('input');
+        inp.type = 'text'; inp.value = emp; inp.placeholder = 'ชื่อพนักงาน';
+        inp.className = 'form-input flex-1';
+        inp.oninput = () => {
+          const oldName = employees[i];
+          employees[i] = inp.value;
+          if (avatarMap[oldName]) { avatarMap[inp.value] = avatarMap[oldName]; delete avatarMap[oldName]; }
+          if (!avatarMap[inp.value]) avatar.value = getInitials(inp.value);
+        };
+
+        const delBtn = document.createElement('button');
+        delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd"/></svg>`;
+        delBtn.className = 'btn btn-danger-ghost p-2 rounded-lg';
+        delBtn.title = 'ลบพนักงาน';
+        delBtn.onclick = () => { employees.splice(i, 1); renderEmployees(); renderDefaults(); };
+
+        row.append(avatar, inp, delBtn);
+        employeesContainer.appendChild(row);
+      });
+    }
+
+    document.getElementById("add-employee-button").onclick = () => { employees.push(''); renderEmployees(); };
+
+    function renderHolidays() {
+      holidaysContainer.innerHTML = "";
+      holidays.forEach((h, i) => {
+        const div = document.createElement("div");
+        div.className = "flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full";
+
+        const inpDate = document.createElement("input");
+        inpDate.type = "date"; inpDate.value = h.date;
+        inpDate.className = "form-input sm:w-44 text-sm";
+        inpDate.onchange = () => { holidays[i].date = inpDate.value; };
+
+        const inpName = document.createElement("input");
+        inpName.type = "text"; inpName.value = h.name; inpName.placeholder = "Holiday name";
+        inpName.className = "form-input flex-1 text-sm";
+        inpName.oninput = () => { holidays[i].name = inpName.value; };
+
+        const btn = document.createElement("button");
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd"/></svg>`;
+        btn.className = "btn btn-danger-ghost p-2 rounded-lg self-end sm:self-auto flex-shrink-0";
+        btn.onclick = () => { holidays.splice(i, 1); renderHolidays(); };
+
+        div.append(inpDate, inpName, btn);
         holidaysContainer.appendChild(div);
       });
     }
 
-    function renderDefaults(){
+    function renderDefaults() {
       defaultsContainer.innerHTML = '';
-
-      // Helper to make a day row editor
       const makeDayRow = (emp, day) => {
         const row = document.createElement('div');
-        row.className = 'grid grid-cols-2 sm:grid-cols-6 gap-3 items-center';
+        row.className = 'grid grid-cols-2 sm:grid-cols-6 gap-2.5 items-center';
 
         const label = document.createElement('div');
-        label.className = 'text-sm text-slate-600 sm:col-span-1';
-        label.textContent = day;
+        label.className = 'text-xs font-medium text-gray-500 uppercase tracking-wide sm:col-span-1';
+        label.textContent = day.slice(0,3);
 
-        const editorWrap = document.createElement('div');
-        editorWrap.className = 'sm:col-span-5';
+        const wrap = document.createElement('div');
+        wrap.className = 'sm:col-span-5';
         const initVal = defaults?.[emp]?.[day] || '';
-        createCellEditor(editorWrap, initVal, defaultLocations, (nv)=>{
+        createCellEditor(wrap, initVal, defaultLocations, nv => {
           if (!defaults[emp]) defaults[emp] = {};
           defaults[emp][day] = nv;
         });
 
-        row.append(label, editorWrap);
+        row.append(label, wrap);
         return row;
       };
 
       employees.forEach(emp => {
         const card = document.createElement('div');
-        card.className = 'border border-slate-200 rounded-xl p-4';
+        card.className = 'defaults-card';
 
         const head = document.createElement('div');
-        head.className = 'flex items-center justify-between';
-        head.innerHTML = `<div class="font-semibold">${emp}</div>`;
+        head.className = 'defaults-card-head';
+        head.innerHTML = `<div class="emp-avatar">${getAvatarText(emp)}</div><div class="font-semibold text-sm text-gray-800">${emp}</div>`;
 
         const body = document.createElement('div');
-        body.className = 'mt-3 space-y-2';
+        body.className = 'p-3 space-y-2';
         daysOfWeek.forEach(day => body.appendChild(makeDayRow(emp, day)));
 
         card.append(head, body);
@@ -567,144 +844,126 @@
       });
     }
 
-    document.getElementById("add-holiday-button").onclick=()=>{holidays.push({date:formatDateForStorage(new Date()),name:""});renderHolidays();};
-    document.getElementById("settings-save-button").onclick=async()=>{
+    document.getElementById("add-holiday-button").onclick = () => { holidays.push({date: formatDateForStorage(new Date()), name:""}); renderHolidays(); };
+
+    document.getElementById("settings-save-button").onclick = async () => {
       const btn = document.getElementById("settings-save-button");
       btn.disabled = true;
-      await setDoc(doc(db,"settings","holidays"),{holidays});
-      await setDoc(doc(db,"settings","defaults"),{defaults});
-      settingsSaveIndicator.textContent = "อัปเดตเรียบร้อย!";
-      settingsSaveIndicator.style.opacity=1;
-      setTimeout(()=>{
-        settingsSaveIndicator.style.opacity=0;
+      await setDoc(doc(db,"settings","employees"), {list: employees.filter(e => e.trim() !== ''), avatarMap});
+      await setDoc(doc(db,"settings","holidays"), {holidays});
+      await setDoc(doc(db,"settings","defaults"), {defaults});
+      flashIndicator(settingsSaveIndicator);
+      setTimeout(() => {
         btn.disabled = false;
         setCurrentWeek(currentWeekStart);
-      }, 2500);
+      }, 2600);
     };
 
     const scheduleView = document.getElementById("schedule-view");
     const settingsView = document.getElementById("settings-view");
     const navSchedule = document.getElementById("nav-schedule");
     const navSettings = document.getElementById("nav-settings");
-    
-    navSchedule.onclick=()=>{
-        settingsView.classList.add("hidden");
-        scheduleView.classList.remove("hidden");
-        navSchedule.classList.add("active");
-        navSettings.classList.remove("active");
+
+    navSchedule.onclick = () => {
+      settingsView.classList.add("hidden");
+      scheduleView.classList.remove("hidden");
+      navSchedule.classList.add("active");
+      navSettings.classList.remove("active");
     };
-    navSettings.onclick=()=>{
-        scheduleView.classList.add("hidden");
-        settingsView.classList.remove("hidden");
-        navSettings.classList.add("active");
-        navSchedule.classList.remove("active");
+    navSettings.onclick = () => {
+      scheduleView.classList.add("hidden");
+      settingsView.classList.remove("hidden");
+      navSettings.classList.add("active");
+      navSchedule.classList.remove("active");
     };
-    
-    const exportButton=document.getElementById("export-button");
-    const exportPreview=document.getElementById("export-preview");
-    const exportContent=document.getElementById("export-content");
-    const exportClose=document.getElementById("export-close");
-    
-    exportButton.addEventListener("click",async() => {
-        const exportSource = document.getElementById("export-source");
-        exportSource.innerHTML = '';
-        exportSource.className = "p-8 bg-white w-[1200px]";
-        
-        const header = document.createElement('div');
-        header.className = "mb-8 text-center";
-        header.innerHTML = `
-          <h1 class="text-4xl font-bold text-[#C9A959]">Weekly Work Report</h1>
-          <p class="text-xl text-slate-600 mt-2">${getWeekDisplayText(currentWeekStart)}</p>
-        `;
-        exportSource.appendChild(header);
-        
-        const table = document.createElement('table');
-        table.className = "min-w-full border-collapse text-left";
-        
-        const thead = document.createElement('thead');
-        thead.innerHTML = `
-          <tr class="border-b-2 border-[#C9A959]">
-            <th class="p-4 text-sm font-bold uppercase text-black/80">Employee</th>
-            <th class="p-4 text-sm font-bold uppercase text-black/80">Monday (${formatDate(currentWeekDates[0])})</th>
-            <th class="p-4 text-sm font-bold uppercase text-black/80">Tuesday (${formatDate(currentWeekDates[1])})</th>
-            <th class="p-4 text-sm font-bold uppercase text-black/80">Wednesday (${formatDate(currentWeekDates[2])})</th>
-            <th class="p-4 text-sm font-bold uppercase text-black/80">Thursday (${formatDate(currentWeekDates[3])})</th>
-            <th class="p-4 text-sm font-bold uppercase text-black/80">Friday (${formatDate(currentWeekDates[4])})</th>
-          </tr>
-        `;
-        table.appendChild(thead);
 
-        const tbody = document.createElement('tbody');
-        employees.forEach((emp, index) => {
-            const tr = document.createElement('tr');
-            tr.className = "border-b border-gray-200";
-            if(index % 2 !== 0) {
-              tr.classList.add("bg-gray-50");
-            }
+    const exportButton = document.getElementById("export-button");
+    const exportPreview = document.getElementById("export-preview");
+    const exportContent = document.getElementById("export-content");
+    const exportClose = document.getElementById("export-close");
 
-            const tdEmp = document.createElement('td');
-            tdEmp.className = "p-4 whitespace-nowrap text-sm font-medium text-slate-800";
-            tdEmp.textContent = emp;
-            tr.appendChild(tdEmp);
+    exportButton.addEventListener("click", async () => {
+      const exportSource = document.getElementById("export-source");
+      exportSource.innerHTML = '';
+      exportSource.className = "p-8 bg-white w-[1200px]";
 
-            currentWeekDates.forEach(d => {
-                const cell = document.createElement('td');
-                cell.className = "p-4 whitespace-nowrap text-sm text-slate-600";
-                
-                if (isHoliday(d)) {
-                    cell.textContent = 'Holiday'; 
-                    cell.className += " font-semibold text-pink-700";
-                } else {
-                    cell.textContent = getValueFor(emp, d) || '-';
-                }
-                if (isSameDay(d, today)) {
-                    cell.className += " font-bold text-[#b8984a]";
-                }
-                tr.appendChild(cell);
-            });
-            tbody.appendChild(tr);
+      const header = document.createElement('div');
+      header.className = "mb-8 text-center";
+      header.innerHTML = `<h1 class="text-4xl font-bold" style="color:#c9a030">Weekly Work Report</h1><p class="text-xl text-slate-500 mt-2">${getWeekDisplayText(currentWeekStart)}</p>`;
+      exportSource.appendChild(header);
+
+      const table = document.createElement('table');
+      table.className = "min-w-full border-collapse text-left";
+      table.innerHTML = `
+        <thead><tr style="border-bottom:2px solid #c9a030">
+          <th style="padding:14px 16px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#374151">Employee</th>
+          <th style="padding:14px 16px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#374151">Monday (${formatDate(currentWeekDates[0])})</th>
+          <th style="padding:14px 16px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#374151">Tuesday (${formatDate(currentWeekDates[1])})</th>
+          <th style="padding:14px 16px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#374151">Wednesday (${formatDate(currentWeekDates[2])})</th>
+          <th style="padding:14px 16px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#374151">Thursday (${formatDate(currentWeekDates[3])})</th>
+          <th style="padding:14px 16px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#374151">Friday (${formatDate(currentWeekDates[4])})</th>
+        </tr></thead>`;
+      const tbody = document.createElement('tbody');
+      employees.forEach((emp, idx) => {
+        const tr = document.createElement('tr');
+        tr.style.cssText = `border-bottom:1px solid #f3f4f6;background:${idx%2?'#f9fafb':'#fff'}`;
+        const tdEmp = document.createElement('td');
+        tdEmp.style.cssText = "padding:12px 16px;font-size:13px;font-weight:600;color:#111827";
+        tdEmp.textContent = emp;
+        tr.appendChild(tdEmp);
+        currentWeekDates.forEach(d => {
+          const cell = document.createElement('td');
+          cell.style.cssText = "padding:12px 16px;font-size:13px;color:#374151";
+          if (isHoliday(d)) {
+            cell.textContent = 'Holiday';
+            cell.style.color = '#dc2626'; cell.style.fontWeight = '600';
+          } else {
+            cell.textContent = getValueFor(emp, d) || '—';
+          }
+          if (isSameDay(d, today)) { cell.style.fontWeight = '700'; cell.style.color = '#b8984a'; }
+          tr.appendChild(cell);
         });
-        table.appendChild(tbody);
-        exportSource.appendChild(table);
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      exportSource.appendChild(table);
+      const footer = document.createElement('p');
+      footer.style.cssText = "margin-top:24px;font-size:11px;color:#9ca3af;text-align:center";
+      footer.textContent = `Generated by SL Work Report on ${new Date().toLocaleDateString()}`;
+      exportSource.appendChild(footer);
 
-        const footer = document.createElement('p');
-        footer.className = "mt-6 text-xs text-gray-500 text-center";
-        footer.textContent = `Generated by SL Work Report on ${new Date().toLocaleDateString()}`;
-        exportSource.appendChild(footer);
+      try {
+        const canvas = await html2canvas(exportSource, { scale: 2, useCORS: true, logging: false });
+        const img = document.createElement("img");
+        img.src = canvas.toDataURL("image/png");
+        img.className = "max-w-full h-auto object-contain mx-auto";
+        exportContent.innerHTML = "";
+        exportContent.appendChild(img);
+        exportPreview.classList.remove("hidden");
+      } catch(e) {
+        console.error(e);
+        alert("เกิดข้อผิดพลาดในการสร้างรูปภาพ กรุณาลองใหม่");
+      } finally {
+        exportSource.innerHTML = '';
+      }
+    });
 
-        try {
-            const canvas = await html2canvas(exportSource, { scale: 2, useCORS: true, logging: false });
-            const img = document.createElement("img");
-            img.src = canvas.toDataURL("image/png");
-            img.className = "max-w-full h-auto object-contain mx-auto";
-            exportContent.innerHTML = "";
-            exportContent.appendChild(img);
-            exportPreview.classList.remove("hidden");
-        } catch(e) {
-            console.error("Error during export:", e);
-            alert("เกิดข้อผิดพลาดในการสร้างรูปภาพ กรุณาลองใหม่อีกครั้ง");
-        } finally {
-            exportSource.innerHTML = '';
-        }
+    exportClose.addEventListener("click", () => exportPreview.classList.add("hidden"));
+    document.getElementById("download-image").addEventListener("click", () => {
+      const img = exportContent.querySelector("img"); if (!img) return;
+      const link = document.createElement("a");
+      link.download = `SL_Schedule_${formatDateForStorage(currentWeekStart)}.png`;
+      link.href = img.src; link.click();
     });
-    
-    exportClose.addEventListener("click",()=>exportPreview.classList.add("hidden"));
-    document.getElementById("download-image").addEventListener("click",()=>{
-        const img=exportContent.querySelector("img");if(!img)return;
-        const link=document.createElement("a");
-        link.download=`SL_Schedule_${formatDateForStorage(currentWeekStart)}.png`;
-        link.href=img.src;link.click();
-    });
-    document.getElementById("copy-image").addEventListener("click",async()=>{
-        try {
-            const img=exportContent.querySelector("img");if(!img)return;
-            const blob=await (await fetch(img.src)).blob();
-            await navigator.clipboard.write([new ClipboardItem({[blob.type]:blob})]);
-            alert("คัดลอกรูปภาพไปยังคลิปบอร์ดแล้ว!");
-        } catch(err) {
-            console.error("Failed to copy image: ", err);
-            alert("ไม่สามารถคัดลอกรูปภาพได้ กรุณาลองใช้เบราว์เซอร์อื่น หรือดาวน์โหลดแทน");
-        }
+    document.getElementById("copy-image").addEventListener("click", async () => {
+      try {
+        const img = exportContent.querySelector("img"); if (!img) return;
+        const blob = await (await fetch(img.src)).blob();
+        await navigator.clipboard.write([new ClipboardItem({[blob.type]: blob})]);
+        alert("คัดลอกรูปภาพไปยังคลิปบอร์ดแล้ว!");
+      } catch(err) {
+        alert("ไม่สามารถคัดลอกรูปภาพได้ กรุณาดาวน์โหลดแทน");
+      }
     });
 
     fetchData();
