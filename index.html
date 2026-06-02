@@ -696,14 +696,16 @@
 
     async function fetchData() {
       loadingOverlay.style.display = "flex";
-      const sSnap = await getDocs(collection(db,"schedules"));
+      const [sSnap, hSnap, dSnap, eSnap] = await Promise.all([
+        getDocs(collection(db,"schedules")),
+        getDoc(doc(db,"settings","holidays")),
+        getDoc(doc(db,"settings","defaults")),
+        getDoc(doc(db,"settings","employees")),
+      ]);
       currentData = {};
       sSnap.forEach(d => { currentData[d.id] = d.data(); });
-      const hSnap = await getDoc(doc(db,"settings","holidays"));
       if (hSnap.exists()) { holidays = hSnap.data().holidays || []; }
-      const dSnap = await getDoc(doc(db,"settings","defaults"));
       if (dSnap.exists()) { defaults = dSnap.data().defaults || {}; } else { defaults = {}; }
-      const eSnap = await getDoc(doc(db,"settings","employees"));
       if (eSnap.exists() && eSnap.data().list?.length) { employees = eSnap.data().list; }
       if (eSnap.exists() && eSnap.data().avatarMap) { avatarMap = eSnap.data().avatarMap; }
 
